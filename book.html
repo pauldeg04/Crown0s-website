@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book an Appointment | Crown Head Spa</title>
+<meta name="description" content="Book your Crown Head Spa appointment online — choose your branch, treatment, date, and time in just a minute.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Crown Head Spa">
+<meta property="og:title" content="Book an Appointment | Crown Head Spa">
+<meta property="og:description" content="Book your Crown Head Spa appointment online — choose your branch, treatment, date, and time in just a minute.">
+<meta property="og:url" content="https://crownheadspa.com/book.html">
+<meta property="og:image" content="https://crownheadspa.com/images/og-preview.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="444">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Book an Appointment | Crown Head Spa">
+<meta name="twitter:description" content="Book your Crown Head Spa appointment online — choose your branch, treatment, date, and time in just a minute.">
+<meta name="twitter:image" content="https://crownheadspa.com/images/og-preview.jpg">
+<link rel="icon" href="images/favicon-32.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
+<script src="js/firebase-init.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="container">
+    <div class="topbar-contact">
+      <a href="tel:+639395884068">📞 0939 588 4068 (Biñan)</a>
+      <a href="tel:+639614402807">📞 0961 440 2807 (Calamba)</a>
+    </div>
+    <div class="header-social">
+      <a class="social-icon" href="https://web.facebook.com/crown.headspa" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.91h-2.33V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg></a>
+      <a class="social-icon" href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+      <a class="social-icon" href="#" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82c-.7-.68-1.13-1.6-1.22-2.62h-3.06v13.4c0 1.5-1.22 2.72-2.72 2.72a2.72 2.72 0 1 1 0-5.44c.25 0 .49.03.72.1V10.9a5.78 5.78 0 0 0-.72-.05A5.78 5.78 0 1 0 15.4 16.6V9.4a7.2 7.2 0 0 0 4.2 1.35V7.68a4.83 4.83 0 0 1-3-1.86Z"/></svg></a>
+    </div>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="nav-wrap">
+    <a href="index.html" class="brand">
+      <img src="images/crown-mark.png" alt="Crown Head Spa crest">
+      <span class="brand-text">Crown Head Spa</span>
+    </a>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="branches.html">Branches</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="promos.html">Promos</a></li>
+        <li><a href="testimonials.html">Testimonials</a></li>
+        <li><a href="contact.html">Contact / FAQ</a></li>
+        <li><a href="careers.html">Careers</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <a href="book.html" class="btn btn-primary"><span>Book Now</span></a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Book an Appointment</p>
+      <h1>Reserve your relaxation</h1>
+      <p>Fill out the form below and we'll confirm your appointment shortly. Prefer to talk to someone directly? Call or message us using the details in the footer.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container" style="max-width:760px;">
+
+      <form id="bookingForm" class="form-card" novalidate>
+        <div class="form-grid">
+
+          <div class="field">
+            <label for="branch">Branch</label>
+            <select id="branch" name="branch" required>
+              <option value="" disabled selected>Select a branch</option>
+              <option value="Biñan">Crown Head Spa — Biñan</option>
+              <option value="Calamba">Crown Head Spa — Calamba</option>
+            </select>
+            <span class="error-msg">Please select a branch.</span>
+          </div>
+
+          <div class="field">
+            <label for="service">Service</label>
+            <select id="service" name="service" required>
+              <option value="" disabled selected>Select a treatment</option>
+              <option value="Back Massage">Back Massage (15 mins)</option>
+              <option value="Crown Detox and Glow">Crown Detox and Glow (90 mins)</option>
+              <option value="Crown Reset">Crown Reset (25 mins)</option>
+              <option value="Crown Serenity">Crown Serenity (45 mins)</option>
+              <option value="Crown Signature Massage (60mins)">Crown Signature Massage (60 mins)</option>
+              <option value="Crown Signature Massage (90mins)">Crown Signature Massage (90 mins)</option>
+              <option value="Dad or Mom & Mini Duo">Dad or Mom &amp; Mini Duo (30 mins)</option>
+              <option value="Detox Flow Massage (60mins)">Detox Flow Massage (60 mins)</option>
+              <option value="Detox Flow Massage (90mins)">Detox Flow Massage (90 mins)</option>
+              <option value="Family Calm Package">Family Calm Package (30 mins)</option>
+              <option value="Foot Reflex">Foot Reflex (15 mins)</option>
+              <option value="Herbal Pack">Herbal Pack (15 mins)</option>
+              <option value="Little Body Massage">Little Body Massage (60 mins)</option>
+              <option value="Little Crown Head Spa">Little Crown Head Spa (30 mins)</option>
+              <option value="Noble Stone">Noble Stone (15 mins)</option>
+              <option value="The Detox and Glow Experience">The Detox and Glow Experience (150 mins)</option>
+              <option value="The Reset Duo">The Reset Duo (85 mins)</option>
+              <option value="The Serenity Set">The Serenity Set (105 mins)</option>
+              <option value="The Sole calm Treat">The Sole Calm Treat (55 mins)</option>
+              <option value="Thermal Calm Massage (60mins)">Thermal Calm Massage (60 mins)</option>
+              <option value="Thermal Calm Massage (90mins)">Thermal Calm Massage (90 mins)</option>
+              <option value="Warm Glow Massage (60mins)">Warm Glow Massage (60 mins)</option>
+              <option value="Warm Glow Massage (90mins)">Warm Glow Massage (90 mins)</option>
+              <option value="Not sure yet">Not sure yet — recommend for me</option>
+            </select>
+            <span class="error-msg">Please choose a service.</span>
+          </div>
+
+          <div class="field">
+            <label for="date">Preferred Date</label>
+            <input type="date" id="date" name="date" required>
+            <span class="error-msg">Please select a date.</span>
+            <span class="date-blocked-msg" id="dateBlockedMsg"></span>
+          </div>
+
+          <div class="field">
+            <label for="time">Preferred Time</label>
+            <select id="time" name="time" required disabled>
+              <option value="" disabled selected>Select branch, service &amp; date first</option>
+            </select>
+            <span class="error-msg">Please select an available time.</span>
+          </div>
+
+          <div class="field">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" placeholder="Juan Dela Cruz" required>
+            <span class="error-msg">Please enter your name.</span>
+          </div>
+
+          <div class="field">
+            <label for="mobile">Mobile Number</label>
+            <input type="tel" id="mobile" name="mobile" placeholder="09XX XXX XXXX" pattern="[0-9+\s\-]{7,15}" required>
+            <span class="error-msg">Please enter a valid mobile number.</span>
+          </div>
+
+          <div class="field full">
+            <label for="email">Email Address <span style="font-weight:400;color:var(--ink-soft);">(optional)</span></label>
+            <input type="email" id="email" name="email" placeholder="you@email.com">
+          </div>
+
+          <div class="field full">
+            <label>Companions <span style="font-weight:400;color:var(--ink-soft);">(optional — add their names and preferred service if you're booking as a group)</span></label>
+            <div id="companionList" class="companion-list"></div>
+            <button type="button" id="addCompanionBtn" class="add-companion-btn">+ Add companion</button>
+          </div>
+
+          <div class="field full">
+            <label for="notes">Notes <span style="font-weight:400;color:var(--ink-soft);">(optional)</span></label>
+            <textarea id="notes" name="notes" placeholder="Any scalp concerns, allergies, or requests we should know about?"></textarea>
+          </div>
+
+        </div>
+
+        <p class="form-note">By booking, you agree to be contacted by Crown Head Spa to confirm your appointment. This is a request, not a guaranteed slot, until confirmed by our staff.</p>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Confirm Booking Request</button>
+
+        <div class="confirmation-box" id="bookingConfirmation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+          <div>
+            <h4>Thank you! Your request has been received.</h4>
+            <p>We'll contact you shortly to confirm your appointment details. See you soon at Crown Head Spa!</p>
+          </div>
+        </div>
+      </form>
+
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="footer-brand">
+          <img src="images/crown-mark.png" alt="Crown Head Spa crest">
+          <span>Crown Head Spa</span>
+        </div>
+        <p>Premium head spa rituals for deep relaxation and scalp wellness.</p>
+        <div class="social-row">
+          <a class="social-icon" href="https://web.facebook.com/crown.headspa" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.91h-2.33V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg></a>
+          <a class="social-icon" href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+          <a class="social-icon" href="#" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82c-.7-.68-1.13-1.6-1.22-2.62h-3.06v13.4c0 1.5-1.22 2.72-2.72 2.72a2.72 2.72 0 1 1 0-5.44c.25 0 .49.03.72.1V10.9a5.78 5.78 0 0 0-.72-.05A5.78 5.78 0 1 0 15.4 16.6V9.4a7.2 7.2 0 0 0 4.2 1.35V7.68a4.83 4.83 0 0 1-3-1.86Z"/></svg></a>
+          <a class="social-icon" href="#" aria-label="Messenger"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.13 2 11.23c0 2.9 1.44 5.5 3.7 7.2V22l3.38-1.86c.9.25 1.87.39 2.92.39 5.52 0 10-4.13 10-9.3S17.52 2 12 2Zm1.02 12.53-2.55-2.72-4.98 2.72 5.48-5.82 2.6 2.72 4.93-2.72-5.48 5.82Z"/></svg></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="promos.html">Promos</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="testimonials.html">Testimonials</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Visit</h4>
+        <ul>
+          <li><a href="branches.html">Our Branches</a></li>
+          <li><a href="book.html">Book an Appointment</a></li>
+          <li><a href="contact.html">Contact &amp; FAQ</a></li>
+          <li><a href="careers.html">Careers</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Get in Touch</h4>
+        <p>Biñan: 0939 588 4068<br>Calamba: 0961 440 2807</p>
+        <p>Biñan open daily 10AM–10PM<br>Calamba open daily 12PM–10PM</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Crown Head Spa. All rights reserved.</span>
+      <span>Text marked [UPDATE THIS] is placeholder — replace with real business details before launch.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
