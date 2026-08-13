@@ -8,7 +8,229 @@ document.addEventListener("DOMContentLoaded", () => {
   initBookingForm();
   markActiveNavLink();
   initGalleryLightbox();
+  initBranchTabs();
+  initGoogleReviews();
 });
+
+/* ==========================================================================
+   Google reviews (testimonials page)
+   Pulls both branches from the getGoogleReviews Cloud Function, which talks
+   to the Google Places API server-side so the API key stays off this page.
+
+   Google caps the API at five reviews per branch and gives no way to ask
+   for more or to sort them by date, so the rating summary above the cards
+   carries the real totals — five cards under "4.9 from 127 reviews" reads
+   as a sample rather than as the whole story.
+
+   Review text is written by the public, so every value from the response is
+   set with textContent and never interpolated into innerHTML.
+   ========================================================================== */
+function initGoogleReviews() {
+  const panels = Array.from(document.querySelectorAll(".branch-panel[data-branch]"));
+  if (panels.length === 0) return;
+
+  (async () => {
+    try {
+      if (!window.firebase || !firebase.apps || firebase.apps.length === 0) {
+        throw new Error("Firebase not initialized");
+      }
+
+      const getGoogleReviews = firebase.functions().httpsCallable("getGoogleReviews");
+      const result = await getGoogleReviews();
+      const branches = (result.data && result.data.branches) || [];
+
+      panels.forEach((panel) => {
+        const branch = branches.find((entry) => entry.key === panel.dataset.branch);
+        renderBranchReviews(panel, branch);
+      });
+
+      upgradeReviewLinks(branches);
+    } catch (err) {
+      console.warn("Could not load Google reviews:", err);
+      panels.forEach((panel) => {
+        setReviewsStatus(
+          panel,
+          "Reviews are taking a moment to load. You can read them on Google in the meantime."
+        );
+      });
+    }
+  })();
+}
+
+/* The "Leave a Review" buttons ship pointing at each branch's Google listing,
+   which always works. When the branch data arrives it carries a place ID, so
+   point them at Google's review composer instead — one fewer tap for a guest
+   who is already willing to write something. */
+function upgradeReviewLinks(branches) {
+  const container = document.querySelector("[data-review-links]");
+  if (!container) return;
+
+  branches.forEach((branch) => {
+    if (!branch.writeReviewUrl) return;
+    const link = container.querySelector('a[data-branch="' + branch.key + '"]');
+    if (link) link.href = branch.writeReviewUrl;
+  });
+}
+
+function setReviewsStatus(panel, message) {
+  panel.innerHTML = "";
+  const status = document.createElement("p");
+  status.className = "reviews-status";
+  status.textContent = message;
+  panel.appendChild(status);
+}
+
+function renderBranchReviews(panel, branch) {
+  if (!branch || !Array.isArray(branch.reviews) || branch.reviews.length === 0) {
+    setReviewsStatus(panel, "No reviews to show for this branch yet.");
+    return;
+  }
+
+  panel.innerHTML = "";
+
+  panel.appendChild(buildReviewsSummary(branch));
+
+  const grid = document.createElement("div");
+  grid.className = "reviews-grid";
+  branch.reviews.forEach((review) => grid.appendChild(buildReviewCard(review)));
+  panel.appendChild(grid);
+
+  if (branch.mapsUrl) {
+    const footer = document.createElement("div");
+    footer.className = "reviews-footer";
+
+    const link = document.createElement("a");
+    link.className = "btn btn-outline";
+    link.href = branch.mapsUrl;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.textContent = "See all reviews on Google";
+
+    footer.appendChild(link);
+    panel.appendChild(footer);
+  }
+}
+
+function buildReviewsSummary(branch) {
+  const summary = document.createElement("div");
+  summary.className = "reviews-summary";
+
+  if (typeof branch.rating === "number") {
+    const score = document.createElement("span");
+    score.className = "reviews-score";
+    score.textContent = branch.rating.toFixed(1);
+    summary.appendChild(score);
+    summary.appendChild(buildStars(branch.rating));
+  }
+
+  const count = document.createElement("span");
+  count.className = "reviews-count";
+  count.textContent = branch.reviewCount === 1
+    ? "1 Google review"
+    : branch.reviewCount.toLocaleString() + " Google reviews";
+  summary.appendChild(count);
+
+  return summary;
+}
+
+/* Rounds to the nearest half star, the way Google's own summary does. */
+function buildStars(rating) {
+  const stars = document.createElement("span");
+  stars.className = "reviews-stars";
+  stars.setAttribute("aria-label", rating.toFixed(1) + " out of 5 stars");
+
+  const rounded = Math.round(rating * 2) / 2;
+  for (let i = 1; i <= 5; i++) {
+    const star = document.createElement("span");
+    star.className = "review-star";
+    if (rounded >= i) {
+      star.classList.add("is-full");
+    } else if (rounded >= i - 0.5) {
+      star.classList.add("is-half");
+    }
+    star.textContent = "★";
+    stars.appendChild(star);
+  }
+
+  return stars;
+}
+
+function buildReviewCard(review) {
+  const card = document.createElement("article");
+  card.className = "review-card";
+
+  const head = document.createElement("div");
+  head.className = "review-head";
+
+  if (review.authorPhoto) {
+    const photo = document.createElement("img");
+    photo.className = "review-avatar";
+    photo.src = review.authorPhoto;
+    photo.alt = "";
+    photo.loading = "lazy";
+    head.appendChild(photo);
+  } else {
+    const initial = document.createElement("span");
+    initial.className = "review-avatar review-avatar-initial";
+    initial.textContent = (review.author || "?").trim().charAt(0).toUpperCase();
+    head.appendChild(initial);
+  }
+
+  const meta = document.createElement("div");
+  meta.className = "review-meta";
+
+  const author = document.createElement("span");
+  author.className = "review-author";
+  author.textContent = review.author;
+  meta.appendChild(author);
+
+  if (review.relativeTime) {
+    const when = document.createElement("span");
+    when.className = "review-time";
+    when.textContent = review.relativeTime;
+    meta.appendChild(when);
+  }
+
+  head.appendChild(meta);
+  card.appendChild(head);
+
+  if (typeof review.rating === "number") {
+    card.appendChild(buildStars(review.rating));
+  }
+
+  const text = document.createElement("p");
+  text.className = "review-text";
+  text.textContent = review.text;
+  card.appendChild(text);
+
+  return card;
+}
+
+/* ==========================================================================
+   Branch tabs
+   Testimonials shows one Elfsight Google Reviews widget per branch. Both
+   widgets stay mounted (no data-elfsight-app-lazy) so each one initializes on
+   page load even while hidden; switching tabs just swaps which panel is shown,
+   then fires a resize so the carousel re-measures itself now that it has width.
+   ========================================================================== */
+function initBranchTabs() {
+  const tabs = Array.from(document.querySelectorAll(".branch-tab"));
+  if (tabs.length === 0) return;
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      tabs.forEach((other) => {
+        const panel = document.getElementById(other.getAttribute("aria-controls"));
+        const isSelected = other === tab;
+        other.classList.toggle("is-active", isSelected);
+        other.setAttribute("aria-selected", isSelected ? "true" : "false");
+        if (panel) panel.hidden = !isSelected;
+      });
+
+      window.dispatchEvent(new Event("resize"));
+    });
+  });
+}
 
 /* ==========================================================================
    Service catalog

@@ -21,8 +21,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
-<!-- Elfsight Google Reviews | Untitled Google Reviews -->
-<script src="https://elfsightcdn.com/platform.js" async></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
+<script src="js/firebase-init.js"></script>
 </head>
 <body>
 
@@ -80,8 +81,21 @@
 
   <section class="section">
     <div class="container">
-      <!-- Elfsight Google Reviews | Untitled Google Reviews -->
-      <div class="elfsight-app-9b3b3288-4a0b-4bba-aa98-4a0e62dd3e70" data-elfsight-app-lazy></div>
+      <div class="branch-tabs" role="tablist" aria-label="Reviews by branch">
+        <button class="branch-tab is-active" role="tab" id="tab-binan" aria-controls="panel-binan" aria-selected="true">Biñan Branch</button>
+        <button class="branch-tab" role="tab" id="tab-calamba" aria-controls="panel-calamba" aria-selected="false">Calamba Branch</button>
+      </div>
+
+      <!-- Both panels are filled by initGoogleReviews() in js/main.js, from the
+           getGoogleReviews Cloud Function. data-branch matches the branch keys
+           the function returns. -->
+      <div class="branch-panel" role="tabpanel" id="panel-binan" aria-labelledby="tab-binan" data-branch="binan">
+        <p class="reviews-status">Loading reviews…</p>
+      </div>
+
+      <div class="branch-panel" role="tabpanel" id="panel-calamba" aria-labelledby="tab-calamba" data-branch="calamba" hidden>
+        <p class="reviews-status">Loading reviews…</p>
+      </div>
     </div>
   </section>
 
@@ -90,8 +104,12 @@
       <div class="cta-band">
         <h2>Enjoyed your visit?</h2>
         <p>Leave us a review on Facebook or Google — it helps other guests find us, and helps us keep improving.</p>
-        <div class="hero-cta">
-          <a href="#" class="btn btn-outline-light">Leave a Review</a>
+        <!-- initGoogleReviews() swaps these for Google's review composer once the
+             branch data (and its place IDs) arrive. These plain listing links are
+             the fallback if that call fails, so the buttons are never dead. -->
+        <div class="hero-cta" data-review-links>
+          <a href="https://maps.app.goo.gl/R6GBtDRr9xnNQyAh7" target="_blank" rel="noopener" class="btn btn-outline-light" data-branch="binan">Review Biñan Branch</a>
+          <a href="https://maps.app.goo.gl/W5TF1tqznpa2moeP9" target="_blank" rel="noopener" class="btn btn-outline-light" data-branch="calamba">Review Calamba Branch</a>
         </div>
       </div>
     </div>

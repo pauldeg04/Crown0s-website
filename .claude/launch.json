@@ -4,7 +4,7 @@
     {
       "name": "crown-head-spa-website",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8934", "--directory", "/Users/macbookpro/Library/CloudStorage/GoogleDrive-pauldeg04@gmail.com/My Drive/WORK/PAUL WORK FOLDER/Programming/2026/Claude Projects/Website"],
+      "runtimeArgs": ["-m", "http.server", "8934", "--directory", "/Users/macbookpro/Documents/Website Projects/CrownOS/Website"],
       "port": 8934,
       "url": "http://localhost:8934"
     }

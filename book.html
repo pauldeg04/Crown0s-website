@@ -83,6 +83,15 @@
   <section class="section">
     <div class="container" style="max-width:760px;">
 
+      <div class="booking-notice">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.1 9.9a16 16 0 0 0 6 6l1.26-1.26a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+        <div>
+          <h4>Please provide an active mobile number</h4>
+          <p>Submitting this form is a <strong>booking request</strong>, not a confirmed appointment yet. Our staff will call or text you to confirm your schedule, so kindly make sure the number you enter is active and reachable.</p>
+          <p><strong>Unconfirmed requests expire within the same day.</strong> If we can't reach you on the number provided, your slot will be released and made available to other guests.</p>
+        </div>
+      </div>
+
       <form id="bookingForm" class="form-card" novalidate>
         <div class="form-grid">
 
@@ -153,6 +162,7 @@
             <label for="mobile">Mobile Number</label>
             <input type="tel" id="mobile" name="mobile" placeholder="09XX XXX XXXX" pattern="[0-9+\s\-]{7,15}" required>
             <span class="error-msg">Please enter a valid mobile number.</span>
+            <span class="field-hint">Use an active number — we'll call or text you to confirm your booking.</span>
           </div>
 
           <div class="field full">
@@ -173,7 +183,7 @@
 
         </div>
 
-        <p class="form-note">By booking, you agree to be contacted by Crown Head Spa to confirm your appointment. This is a request, not a guaranteed slot, until confirmed by our staff.</p>
+        <p class="form-note">By booking, you agree to be contacted by Crown Head Spa to confirm your appointment. This is a request, not a guaranteed slot, until confirmed by our staff. Requests that stay unconfirmed expire within the same day.</p>
 
         <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Confirm Booking Request</button>
 
@@ -181,7 +191,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
           <div>
             <h4>Thank you! Your request has been received.</h4>
-            <p>We'll contact you shortly to confirm your appointment details. See you soon at Crown Head Spa!</p>
+            <p>Please keep your phone handy — our staff will call or text the mobile number you provided to confirm your appointment. Your slot is reserved only once confirmed, and requests left unconfirmed expire within the same day. See you soon at Crown Head Spa!</p>
           </div>
         </div>
       </form>

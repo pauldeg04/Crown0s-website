@@ -809,6 +809,46 @@ input[type="date"] {
 
 .form-note { font-size: 0.82rem; color: var(--ink-soft); margin-top: 4px; }
 
+.field-hint {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  margin-top: 4px;
+  display: block;
+}
+
+.booking-notice {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--sage-light);
+  border: 1px solid rgba(169, 121, 10, 0.35);
+  border-left: 4px solid var(--gold);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-bottom: 22px;
+}
+.booking-notice svg {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  margin-top: 2px;
+  color: var(--gold-dark);
+}
+.booking-notice h4 {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 4px;
+  color: var(--ink);
+}
+.booking-notice p {
+  font-size: 0.86rem;
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.55;
+}
+.booking-notice p + p { margin-top: 6px; }
+
 .companion-list { display: flex; flex-direction: column; gap: 10px; }
 .companion-row { display: flex; gap: 8px; align-items: flex-start; }
 .companion-fields {
@@ -1014,6 +1054,138 @@ input[type="date"] {
 
 .breadcrumb { font-size: 0.82rem; color: var(--ink-soft); margin-bottom: 14px; }
 .breadcrumb a { color: var(--sage-dark); }
+
+/* ==========================================================================
+   Branch tabs (Testimonials — one Google Reviews widget per branch)
+   ========================================================================== */
+
+.branch-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.branch-tab {
+  padding: 12px 26px;
+  border-radius: 999px;
+  border: 1px solid var(--beige);
+  background: var(--white);
+  color: var(--ink-soft);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.branch-tab:hover { border-color: var(--sage); color: var(--ink); }
+
+.branch-tab.is-active {
+  background: var(--rose-gold);
+  border-color: var(--rose-gold);
+  color: var(--white);
+  box-shadow: var(--shadow-soft);
+}
+
+.branch-panel[hidden] { display: none; }
+
+/* ==========================================================================
+   Google review cards
+   ========================================================================== */
+
+.reviews-status {
+  text-align: center;
+  color: var(--ink-soft);
+  padding: 32px 0;
+}
+
+.reviews-summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.reviews-score {
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.reviews-count { color: var(--ink-soft); font-size: 0.95rem; }
+
+.reviews-stars { display: inline-flex; gap: 2px; line-height: 1; }
+.review-star { color: var(--beige); font-size: 1.1rem; }
+.review-star.is-full { color: var(--gold); }
+.review-star.is-half {
+  background: linear-gradient(90deg, var(--gold) 50%, var(--beige) 50%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.review-card {
+  background: var(--white);
+  border: 1px solid var(--beige);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: var(--shadow-soft);
+}
+
+.review-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+
+.review-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.review-avatar-initial {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sage-light);
+  color: var(--sage-dark);
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+.review-meta { display: flex; flex-direction: column; min-width: 0; }
+.review-author { font-weight: 600; color: var(--ink); }
+.review-time { font-size: 0.82rem; color: var(--ink-soft); }
+
+.review-text {
+  margin: 12px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.reviews-footer { text-align: center; margin-top: 32px; }
+
+/* The two branch review buttons carry longer labels than a normal .btn, which
+   is nowrap by default — on a phone that pushes them wider than the CTA band.
+   Let them wrap and stay inside it. */
+.hero-cta[data-review-links] { justify-content: center; }
+.hero-cta[data-review-links] .btn {
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
+}
 
 /* Utility */
 .text-center { text-align: center; }
