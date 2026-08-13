@@ -849,6 +849,15 @@ input[type="date"] {
 }
 .booking-notice p + p { margin-top: 6px; }
 
+/* Applying is a phone call rather than a form, so the openings card lists the
+   branch numbers instead of carrying an "Apply Now" button. */
+.apply-lines { display: flex; flex-direction: column; gap: 4px; margin: 0; }
+.apply-lines a {
+  font-weight: 600;
+  color: var(--gold-dark);
+}
+.apply-lines a:hover { text-decoration: underline; }
+
 .companion-list { display: flex; flex-direction: column; gap: 10px; }
 .companion-row { display: flex; gap: 8px; align-items: flex-start; }
 .companion-fields {
