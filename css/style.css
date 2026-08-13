@@ -849,8 +849,19 @@ input[type="date"] {
 }
 .booking-notice p + p { margin-top: 6px; }
 
-/* Applying is a phone call rather than a form, so the openings card lists the
-   branch numbers instead of carrying an "Apply Now" button. */
+/* Hiring is handled over the phone rather than through a form or an inbox, so
+   the careers page ends on the branch numbers instead of an "Apply Now" button. */
+.careers-inquire {
+  max-width: 540px;
+  margin: 0 auto;
+  text-align: center;
+}
+.careers-hours {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  margin: 14px 0 0;
+}
+
 .apply-lines { display: flex; flex-direction: column; gap: 4px; margin: 0; }
 .apply-lines a {
   font-weight: 600;
