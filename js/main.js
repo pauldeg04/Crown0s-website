@@ -10,7 +10,140 @@ document.addEventListener("DOMContentLoaded", () => {
   initGalleryLightbox();
   initBranchTabs();
   initGoogleReviews();
+  initCookieConsent();
 });
+
+/* ==========================================================================
+   Cookie consent
+
+   Nothing on this site tracks anyone yet, so today this bar only records a
+   preference. It exists ahead of that because consent has to be asked BEFORE
+   a tracking script runs, not after — wiring it in later would mean the first
+   visitors were measured without being asked.
+
+   When an analytics or advertising tag is added, load it from
+   onConsentGranted() below and nowhere else. Putting the tag straight into the
+   page would fire it on load regardless of what the visitor chose here.
+   ========================================================================== */
+
+const CONSENT_KEY = "crownCookieConsent";
+
+function readConsent() {
+  try {
+    return localStorage.getItem(CONSENT_KEY);
+  } catch (err) {
+    /* Private browsing can throw on access. Treat it as "not asked yet" and
+       leave the visitor untracked, which is the safe direction to fail. */
+    return null;
+  }
+}
+
+function storeConsent(value) {
+  try {
+    localStorage.setItem(CONSENT_KEY, value);
+  } catch (err) {
+    /* Nothing to do — the bar reappears next visit, which is preferable to
+       assuming a consent we could not record. */
+  }
+}
+
+/* The single place a tracking tag may be started from. */
+function onConsentGranted() {
+  /* No analytics or advertising tags are installed yet. */
+}
+
+function initCookieConsent() {
+  const footerLegal = document.querySelector(".footer-legal");
+
+  if (footerLegal) {
+    const reset = document.createElement("button");
+    reset.type = "button";
+    reset.className = "cookie-reset";
+    reset.textContent = "Cookie settings";
+    reset.addEventListener("click", () => showCookieBar(true));
+    footerLegal.appendChild(reset);
+  }
+
+  const consent = readConsent();
+
+  if (consent === "accepted") {
+    onConsentGranted();
+    return;
+  }
+
+  if (consent === "declined") {
+    return;
+  }
+
+  showCookieBar(false);
+}
+
+function showCookieBar(reopened) {
+  let bar = document.getElementById("cookieBar");
+
+  if (!bar) {
+    bar = buildCookieBar();
+    document.body.appendChild(bar);
+  }
+
+  if (reopened) {
+    bar.querySelector(".cookie-reopened").hidden = false;
+  }
+
+  /* Added hidden, then shown on the next frame so the bar animates in rather
+     than appearing mid-paint on first load. */
+  requestAnimationFrame(() => bar.classList.add("show"));
+}
+
+function buildCookieBar() {
+  const bar = document.createElement("div");
+  bar.id = "cookieBar";
+  bar.className = "cookie-bar";
+  bar.setAttribute("role", "region");
+  bar.setAttribute("aria-label", "Cookie choices");
+
+  const text = document.createElement("p");
+  text.innerHTML =
+    "We use only what this site needs to work. With your permission we would " +
+    "also like to measure how the site is used so we can improve it. " +
+    "Declining changes nothing about how the site works for you. " +
+    '<a href="privacy.html">Read our Privacy Policy</a>.' +
+    '<span class="cookie-reopened" hidden> Choosing below replaces your previous answer.</span>';
+
+  const actions = document.createElement("div");
+  actions.className = "cookie-actions";
+
+  const decline = document.createElement("button");
+  decline.type = "button";
+  decline.className = "btn btn-quiet";
+  decline.textContent = "Decline";
+  decline.addEventListener("click", () => {
+    storeConsent("declined");
+    hideCookieBar(bar);
+  });
+
+  const accept = document.createElement("button");
+  accept.type = "button";
+  accept.className = "btn btn-primary";
+  accept.innerHTML = "<span>Accept</span>";
+  accept.addEventListener("click", () => {
+    storeConsent("accepted");
+    onConsentGranted();
+    hideCookieBar(bar);
+  });
+
+  actions.appendChild(decline);
+  actions.appendChild(accept);
+
+  bar.appendChild(text);
+  bar.appendChild(actions);
+
+  return bar;
+}
+
+function hideCookieBar(bar) {
+  bar.classList.remove("show");
+}
 
 /* ==========================================================================
    Google reviews (testimonials page)

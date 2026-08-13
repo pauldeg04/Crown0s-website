@@ -1207,6 +1207,121 @@ input[type="date"] {
   text-align: center;
 }
 
+/* Legal pages — long-form reading rather than marketing copy, so the measure
+   is narrower and the headings are plainer than the rest of the site. */
+.legal-doc {
+  max-width: 760px;
+}
+
+.legal-doc h2 {
+  font-size: clamp(1.3rem, 2.4vw, 1.6rem);
+  margin-top: 2em;
+}
+
+.legal-doc h2:first-of-type { margin-top: 1em; }
+
+.legal-doc h3 {
+  font-family: var(--font-body);
+  font-size: 1.02rem;
+  font-weight: 700;
+  margin-bottom: 0.4em;
+}
+
+.legal-doc ul {
+  padding-left: 1.2em;
+  margin: 0 0 1em;
+  color: var(--ink-soft);
+}
+
+.legal-doc li { margin-bottom: 0.5em; }
+
+.legal-doc a {
+  color: var(--gold-dark);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.legal-meta {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--beige);
+  padding-bottom: 14px;
+}
+
+.legal-callout {
+  background: var(--sage-light);
+  border-left: 4px solid var(--gold);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  margin: 1.4em 0;
+}
+
+.legal-callout p { margin-bottom: 0; color: var(--ink); font-size: 0.92rem; }
+
+.legal-contact { list-style: none; padding-left: 0; }
+
+/* Cookie consent — a fixed bar rather than a modal, so it never blocks the
+   page or the booking form behind it. */
+.cookie-bar {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 200;
+  display: none;
+  gap: 18px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 18px 20px;
+  background: var(--white);
+  border: 1px solid var(--beige);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+}
+
+.cookie-bar.show { display: flex; }
+
+.cookie-bar p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--ink);
+  flex: 1 1 320px;
+  line-height: 1.55;
+}
+
+.cookie-bar a { color: var(--gold-dark); font-weight: 600; text-decoration: underline; }
+
+/* Accept and decline are the same size and weight on purpose — a refusal has
+   to be as easy to give as a consent. */
+.cookie-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.cookie-actions .btn { padding: 10px 20px; font-size: 0.86rem; }
+
+.btn-quiet {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--ink);
+}
+
+.btn-quiet:hover { background: var(--cream-deep); }
+
+.cookie-reset {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.footer-legal { display: flex; gap: 16px; flex-wrap: wrap; }
+.footer-legal a:hover,
+.footer-legal .cookie-reset:hover { color: var(--sage); }
+
 /* Utility */
 .text-center { text-align: center; }
 .mt-0 { margin-top: 0; }
