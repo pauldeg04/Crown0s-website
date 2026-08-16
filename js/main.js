@@ -11,7 +11,88 @@ document.addEventListener("DOMContentLoaded", () => {
   initBranchTabs();
   initGoogleReviews();
   initCookieConsent();
+  initPromoModal();
 });
+
+/* ==========================================================================
+   Booking promo popup
+
+   Opens when the booking page loads, once per browser session so guests who
+   come back to the form aren't shown it again. Closed with the X button, the
+   "Maybe later" link, the backdrop, or Escape. Only book.html carries the
+   markup, so this is a no-op everywhere else.
+   ========================================================================== */
+
+const PROMO_MODAL_KEY = "crownPromoSeen";
+
+function initPromoModal() {
+  const modal = document.getElementById("promoModal");
+  if (!modal) return;
+
+  // sessionStorage throws in private-mode Safari, so a failed read just means
+  // the popup shows — better than the page erroring out.
+  try {
+    if (sessionStorage.getItem(PROMO_MODAL_KEY) === "1") return;
+  } catch (err) {
+    /* storage unavailable — fall through and show it */
+  }
+
+  const card = modal.querySelector(".promo-modal-card");
+  const closeBtn = modal.querySelector(".promo-modal-close");
+  const dismissBtn = modal.querySelector(".promo-modal-dismiss");
+  const cta = modal.querySelector("#promoModalCta");
+  const lastFocused = document.activeElement;
+
+  function open() {
+    modal.hidden = false;
+    modal.classList.add("open");
+    document.body.style.overflow = "hidden";
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function close() {
+    modal.classList.remove("open");
+    modal.hidden = true;
+    document.body.style.overflow = "";
+    try {
+      sessionStorage.setItem(PROMO_MODAL_KEY, "1");
+    } catch (err) {
+      /* storage unavailable — the popup will simply show again next load */
+    }
+    if (lastFocused && typeof lastFocused.focus === "function") lastFocused.focus();
+  }
+
+  if (closeBtn) closeBtn.addEventListener("click", close);
+  if (dismissBtn) dismissBtn.addEventListener("click", close);
+  if (cta) cta.addEventListener("click", close);
+
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) close();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && modal.classList.contains("open")) close();
+  });
+
+  // Keep tabbing inside the popup while it's open.
+  modal.addEventListener("keydown", (event) => {
+    if (event.key !== "Tab") return;
+    const focusable = card.querySelectorAll("button, [href]");
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  // Small delay so the page paints first and the popup doesn't feel abrupt.
+  setTimeout(open, 600);
+}
 
 /* ==========================================================================
    Cookie consent

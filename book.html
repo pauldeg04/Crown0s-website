@@ -28,6 +28,21 @@
 </head>
 <body>
 
+<!-- Promo popup — opens automatically on this page, closed with the X. -->
+<div class="promo-modal" id="promoModal" role="dialog" aria-modal="true" aria-labelledby="promoModalTitle" hidden>
+  <div class="promo-modal-card">
+    <button type="button" class="promo-modal-close" id="promoModalClose" aria-label="Close">&times;</button>
+    <h2 id="promoModalTitle" class="sr-only">Our opening rates are extended until August 31, 2026</h2>
+    <img class="promo-modal-poster" src="images/promo-opening-rates-extended.jpg"
+         width="1024" height="1536"
+         alt="Crown Head Spa promo: our opening rates are extended until August 31, 2026. Lower prices on premium services, exclusive booking at opening rates, limited time offer.">
+    <div class="promo-modal-actions">
+      <a href="#bookingForm" class="btn btn-primary" id="promoModalCta"><span>Book Now &amp; Save More</span></a>
+      <button type="button" class="promo-modal-dismiss">Maybe later</button>
+    </div>
+  </div>
+</div>
+
 <div class="topbar">
   <div class="container">
     <div class="topbar-contact">
