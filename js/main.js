@@ -12,7 +12,37 @@ document.addEventListener("DOMContentLoaded", () => {
   initGoogleReviews();
   initCookieConsent();
   initPromoModal();
+  initFbChatWidget();
 });
+
+/* ==========================================================================
+   Floating Messenger chat widget
+
+   Toggle button in the corner opens a small menu with one m.me link per
+   branch. Markup is repeated on every page, so this just wires the click
+   handlers and closes the menu on an outside click or Escape.
+   ========================================================================== */
+
+function initFbChatWidget() {
+  const widget = document.querySelector(".fb-chat-widget");
+  if (!widget) return;
+
+  const toggle = widget.querySelector(".fb-chat-toggle");
+  const menu = widget.querySelector(".fb-chat-menu");
+  if (!toggle || !menu) return;
+
+  toggle.addEventListener("click", () => {
+    menu.classList.toggle("open");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!widget.contains(e.target)) menu.classList.remove("open");
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") menu.classList.remove("open");
+  });
+}
 
 /* ==========================================================================
    Booking promo popup
