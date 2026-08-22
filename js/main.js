@@ -3,8 +3,9 @@
 document.addEventListener("DOMContentLoaded", () => {
   initNavToggle();
   initAccordions();
+  initGuestRows();
   initServiceCatalog();
-  initCompanions();
+  initBranchCapacities();
   initBookingForm();
   markActiveNavLink();
   initGalleryLightbox();
@@ -485,6 +486,32 @@ function initBranchTabs() {
    needing this file hand-edited too. Falls back to the built-in options
    already in the markup if the call fails or returns nothing.
    ========================================================================== */
+/* Cached once the live service list loads, so any guest row added later
+   (via initGuestRows, count changed after this fetch resolves) gets the
+   same live options instead of falling back to the static <template>. */
+let liveServiceOptionsHtml = null;
+
+function buildServiceSelectHtml(services) {
+  const select = document.createElement("select");
+
+  const placeholder = new Option("Select a treatment", "", true, true);
+  placeholder.disabled = true;
+  select.appendChild(placeholder);
+
+  services.forEach((service) => {
+    // Some service names already end in "(60mins)" etc. (used to tell
+    // duration variants of the same treatment apart) — strip that
+    // before appending the real duration so the label doesn't read
+    // "Name (60mins) (60 mins)". The value stays the exact name,
+    // unstripped, since that's what has to match crownServiceMasterList.
+    const displayName = service.name.replace(/\s*\(\d+\s*mins?\)\s*$/i, "");
+    select.appendChild(new Option(`${displayName} (${service.duration} mins)`, service.name));
+  });
+
+  select.appendChild(new Option("Not sure yet — recommend for me", "Not sure yet"));
+  return select.innerHTML;
+}
+
 function initServiceCatalog() {
   const serviceSelect = document.getElementById("service");
   if (!serviceSelect) return;
@@ -500,23 +527,18 @@ function initServiceCatalog() {
       const services = (result.data && result.data.services) || [];
       if (services.length === 0) return;
 
-      serviceSelect.innerHTML = "";
+      liveServiceOptionsHtml = buildServiceSelectHtml(services);
 
-      const placeholder = new Option("Select a treatment", "", true, true);
-      placeholder.disabled = true;
-      serviceSelect.appendChild(placeholder);
-
-      services.forEach((service) => {
-        // Some service names already end in "(60mins)" etc. (used to tell
-        // duration variants of the same treatment apart) — strip that
-        // before appending the real duration so the label doesn't read
-        // "Name (60mins) (60 mins)". The value stays the exact name,
-        // unstripped, since that's what has to match crownServiceMasterList.
-        const displayName = service.name.replace(/\s*\(\d+\s*mins?\)\s*$/i, "");
-        serviceSelect.appendChild(new Option(`${displayName} (${service.duration} mins)`, service.name));
+      // Refresh every service select already on the page (guest 1's, plus
+      // any companion rows added before this fetch resolved), preserving
+      // whatever the guest had already picked where it still exists.
+      document.querySelectorAll('#guestRows select').forEach((select) => {
+        const current = select.value;
+        select.innerHTML = liveServiceOptionsHtml;
+        if (current && Array.from(select.options).some((option) => option.value === current)) {
+          select.value = current;
+        }
       });
-
-      serviceSelect.appendChild(new Option("Not sure yet — recommend for me", "Not sure yet"));
     } catch (err) {
       console.warn("Could not load the live service list, keeping the built-in one:", err);
     }
@@ -524,40 +546,139 @@ function initServiceCatalog() {
 }
 
 /* ==========================================================================
-   Booking companions
-   Lets a guest list the names of people they're booking with. Purely
-   informational for staff (shown in the CrownOS booking request queue) —
-   does not affect slot availability/capacity.
+   Guest rows (Name + Service, one pair per guest)
+
+   "Number of Guest" drives how many Name/Service row pairs are shown —
+   guest 1's inputs ARE the form's real #name/#service fields (the ones
+   refreshSlots/submit already read), guests 2+ reuse the old
+   "companion"/"companionService" field names so getCompanions() and the
+   Cloud Function payload shape (clientName/serviceName + companions[])
+   don't need to change. Rows are only appended/removed at the end when the
+   count changes, so guest 1's element is never recreated and stays a
+   stable reference for the rest of initBookingForm.
    ========================================================================== */
 
-function initCompanions() {
-  const list = document.getElementById("companionList");
-  const addBtn = document.getElementById("addCompanionBtn");
-  const serviceTemplate = document.getElementById("service");
-  if (!list || !addBtn || !serviceTemplate) return;
+function initGuestRows() {
+  const countSelect = document.getElementById("guestCount");
+  const rowsContainer = document.getElementById("guestRows");
+  const serviceTemplate = document.getElementById("serviceOptionsTemplate");
+  if (!countSelect || !rowsContainer || !serviceTemplate) return;
 
-  function addCompanionRow() {
+  function makeRow(index) {
+    const isPrimary = index === 0;
     const row = document.createElement("div");
-    row.className = "companion-row";
-    row.innerHTML =
-      '<div class="companion-fields">' +
-        '<input type="text" name="companion" placeholder="Companion\'s name" maxlength="80" required>' +
-        '<select name="companionService" required></select>' +
-      '</div>' +
-      '<button type="button" class="companion-remove" aria-label="Remove companion">&times;</button>';
+    row.className = isPrimary ? "guest-row" : "guest-row companion-row";
 
-    row.querySelector('select[name="companionService"]').innerHTML = serviceTemplate.innerHTML;
-    list.appendChild(row);
-    row.querySelector("input").focus();
+    const nameAttrs = isPrimary ? 'id="name" name="name"' : 'name="companion"';
+    const serviceAttrs = isPrimary ? 'id="service" name="service"' : 'name="companionService"';
+
+    row.innerHTML =
+      '<div class="field">' +
+        '<input type="text" ' + nameAttrs + ' placeholder="Guest ' + (index + 1) + ' full name" maxlength="80" required>' +
+        '<span class="error-msg">Please enter a name.</span>' +
+      '</div>' +
+      '<div class="field">' +
+        '<select ' + serviceAttrs + ' required></select>' +
+        '<span class="error-msg">Please choose a service.</span>' +
+      '</div>';
+
+    row.querySelector("select").innerHTML = liveServiceOptionsHtml || serviceTemplate.innerHTML;
+    return row;
   }
 
-  addBtn.addEventListener("click", addCompanionRow);
+  function renderRows(count) {
+    const rows = Array.from(rowsContainer.querySelectorAll(".guest-row"));
 
-  list.addEventListener("click", (event) => {
-    const removeBtn = event.target.closest(".companion-remove");
-    if (!removeBtn) return;
-    removeBtn.closest(".companion-row").remove();
+    if (count > rows.length) {
+      for (let i = rows.length; i < count; i++) {
+        rowsContainer.appendChild(makeRow(i));
+      }
+    } else if (count < rows.length) {
+      for (let i = rows.length - 1; i >= count; i--) {
+        rows[i].remove();
+      }
+    }
+  }
+
+  countSelect.addEventListener("change", () => {
+    renderRows(Number(countSelect.value) || 1);
   });
+
+  renderRows(Number(countSelect.value) || 1);
+}
+
+/* ==========================================================================
+   Branch bed capacity
+
+   Caps "Number of Guest" at the selected branch's actual bed count (a
+   party bigger than that can't all be seated the same visit anyway) and
+   shows a note steering bigger groups toward splitting into two booking
+   requests. Falls back to a single "1" option — already in the markup —
+   if the branch list can't be loaded, same fallback style as
+   initServiceCatalog.
+   ========================================================================== */
+
+let branchBedCapacities = {};
+
+function populateGuestCountOptions(maxGuests){
+  const guestCountSelect = document.getElementById("guestCount");
+  if (!guestCountSelect) return;
+
+  const max = Math.max(1, Number(maxGuests) || 1);
+  const previous = Number(guestCountSelect.value) || 1;
+
+  guestCountSelect.innerHTML = "";
+  for (let i = 1; i <= max; i++) {
+    guestCountSelect.appendChild(new Option(String(i), String(i)));
+  }
+
+  guestCountSelect.value = String(Math.min(previous, max));
+  guestCountSelect.dispatchEvent(new Event("change"));
+}
+
+function updateGuestCountHint(maxGuests){
+  const hint = document.getElementById("guestCountHint");
+  if (!hint) return;
+
+  hint.textContent = maxGuests
+    ? "Booking for a bigger group than this? Please send a separate booking request for the rest — split into two so everyone gets a bed."
+    : "";
+}
+
+function initBranchCapacities(){
+  const branchSelect = document.getElementById("branch");
+  if (!branchSelect) return;
+
+  function applyForSelectedBranch(){
+    const beds = branchBedCapacities[branchSelect.value];
+    populateGuestCountOptions(beds || 1);
+    updateGuestCountHint(beds);
+  }
+
+  branchSelect.addEventListener("change", applyForSelectedBranch);
+
+  (async () => {
+    try {
+      if (!window.firebase || !firebase.apps || firebase.apps.length === 0) {
+        throw new Error("Firebase not initialized");
+      }
+
+      const getBookableBranches = firebase.functions().httpsCallable("getBookableBranches");
+      const result = await getBookableBranches();
+      const branches = (result.data && result.data.branches) || [];
+
+      branchBedCapacities = {};
+      branches.forEach((branch) => {
+        branchBedCapacities[branch.name] = Number(branch.beds) || 1;
+      });
+
+      if (branchSelect.value) {
+        applyForSelectedBranch();
+      }
+    } catch (err) {
+      console.warn("Could not load branch bed capacities, keeping the default guest count range:", err);
+    }
+  })();
 }
 
 /* Only counts a row once BOTH the name and service are filled in — a row

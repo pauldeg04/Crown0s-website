@@ -119,27 +119,11 @@
           </div>
 
           <div class="field">
-            <label for="service">Service</label>
-            <select id="service" name="service" required>
-              <option value="" disabled selected>Select a treatment</option>
-              <option value="Crown Detox and Glow">Crown Detox and Glow (90 mins)</option>
-              <option value="Crown Reset">Crown Reset (25 mins)</option>
-              <option value="Crown Serenity">Crown Serenity (45 mins)</option>
-              <option value="Crown Signature Massage (60mins)">Crown Signature Massage (60 mins)</option>
-              <option value="Crown Signature Massage (90mins)">Crown Signature Massage (90 mins)</option>
-              <option value="Detox Flow Massage (60mins)">Detox Flow Massage (60 mins)</option>
-              <option value="Detox Flow Massage (90mins)">Detox Flow Massage (90 mins)</option>
-              <option value="The Detox and Glow Experience">The Detox and Glow Experience (150 mins)</option>
-              <option value="The Reset Duo">The Reset Duo (85 mins)</option>
-              <option value="The Serenity Set">The Serenity Set (105 mins)</option>
-              <option value="The Sole calm Treat">The Sole Calm Treat (55 mins)</option>
-              <option value="Thermal Calm Massage (60mins)">Thermal Calm Massage (60 mins)</option>
-              <option value="Thermal Calm Massage (90mins)">Thermal Calm Massage (90 mins)</option>
-              <option value="Warm Glow Massage (60mins)">Warm Glow Massage (60 mins)</option>
-              <option value="Warm Glow Massage (90mins)">Warm Glow Massage (90 mins)</option>
-              <option value="Not sure yet">Not sure yet — recommend for me</option>
+            <label for="guestCount">Number of Guest</label>
+            <select id="guestCount" name="guestCount" required>
+              <option value="1">1</option>
             </select>
-            <span class="error-msg">Please choose a service.</span>
+            <span class="field-hint" id="guestCountHint"></span>
           </div>
 
           <div class="field">
@@ -158,27 +142,24 @@
           </div>
 
           <div class="field">
-            <label for="name">Full Name</label>
-            <input type="text" id="name" name="name" placeholder="Juan Dela Cruz" required>
-            <span class="error-msg">Please enter your name.</span>
-          </div>
-
-          <div class="field">
-            <label for="mobile">Mobile Number</label>
+            <label for="mobile">Contact Number <span style="font-weight:400;color:var(--ink-soft);">(Required)</span></label>
             <input type="tel" id="mobile" name="mobile" placeholder="09XX XXX XXXX" pattern="[0-9+\s\-]{7,15}" required>
             <span class="error-msg">Please enter a valid mobile number.</span>
             <span class="field-hint">Use an active number — we'll call or text you to confirm your booking.</span>
           </div>
 
-          <div class="field full">
+          <div class="field">
             <label for="email">Email Address <span style="font-weight:400;color:var(--ink-soft);">(optional)</span></label>
             <input type="email" id="email" name="email" placeholder="you@email.com">
           </div>
 
           <div class="field full">
-            <label>Companions <span style="font-weight:400;color:var(--ink-soft);">(optional — add their names and preferred service if you're booking as a group)</span></label>
-            <div id="companionList" class="companion-list"></div>
-            <button type="button" id="addCompanionBtn" class="add-companion-btn">+ Add companion</button>
+            <label>Name &amp; Services</label>
+            <div class="guest-rows-header">
+              <span>Full Name</span>
+              <span>Service</span>
+            </div>
+            <div id="guestRows" class="guest-rows"></div>
           </div>
 
           <div class="field full">
@@ -187,6 +168,26 @@
           </div>
 
         </div>
+
+        <template id="serviceOptionsTemplate">
+          <option value="" disabled selected>Select a treatment</option>
+          <option value="Crown Detox and Glow">Crown Detox and Glow (90 mins)</option>
+          <option value="Crown Reset">Crown Reset (25 mins)</option>
+          <option value="Crown Serenity">Crown Serenity (45 mins)</option>
+          <option value="Crown Signature Massage (60mins)">Crown Signature Massage (60 mins)</option>
+          <option value="Crown Signature Massage (90mins)">Crown Signature Massage (90 mins)</option>
+          <option value="Detox Flow Massage (60mins)">Detox Flow Massage (60 mins)</option>
+          <option value="Detox Flow Massage (90mins)">Detox Flow Massage (90 mins)</option>
+          <option value="The Detox and Glow Experience">The Detox and Glow Experience (150 mins)</option>
+          <option value="The Reset Duo">The Reset Duo (85 mins)</option>
+          <option value="The Serenity Set">The Serenity Set (105 mins)</option>
+          <option value="The Sole calm Treat">The Sole Calm Treat (55 mins)</option>
+          <option value="Thermal Calm Massage (60mins)">Thermal Calm Massage (60 mins)</option>
+          <option value="Thermal Calm Massage (90mins)">Thermal Calm Massage (90 mins)</option>
+          <option value="Warm Glow Massage (60mins)">Warm Glow Massage (60 mins)</option>
+          <option value="Warm Glow Massage (90mins)">Warm Glow Massage (90 mins)</option>
+          <option value="Not sure yet">Not sure yet — recommend for me</option>
+        </template>
 
         <p class="form-note">By booking, you agree to be contacted by Crown Head Spa to confirm your appointment. This is a request, not a guaranteed slot, until confirmed by our staff. Requests that stay unconfirmed expire within the same day.</p>
 

@@ -869,61 +869,28 @@ input[type="date"] {
 }
 .apply-lines a:hover { text-decoration: underline; }
 
-.companion-list { display: flex; flex-direction: column; gap: 10px; }
-.companion-row { display: flex; gap: 8px; align-items: flex-start; }
-.companion-fields {
-  flex: 1;
-  min-width: 0;
+/* Guest rows — one Name + Service pair per guest, count driven by the
+   "Number of Guest" field (see initGuestRows in main.js). Guest 1's inputs
+   are the form's real #name/#service fields; guest 2+ reuse the old
+   "companion"/"companionService" field names so getCompanions() and the
+   Cloud Function payload shape are unchanged. */
+.guest-rows { display: flex; flex-direction: column; gap: 12px; }
+.guest-rows-header {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-@media (max-width: 560px) { .companion-fields { grid-template-columns: 1fr; } }
-.companion-fields input,
-.companion-fields select {
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  box-sizing: border-box;
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  padding: 13px 16px;
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(20, 17, 10,0.16);
-  background: var(--cream);
-  color: var(--ink);
-}
-.companion-fields input:focus,
-.companion-fields select:focus {
-  outline: none;
-  border-color: var(--sage);
-  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.25);
-}
-.companion-remove {
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1px solid rgba(20, 17, 10,0.16);
-  background: var(--white);
-  color: var(--ink-soft);
-  font-size: 1.1rem;
-  line-height: 1;
-  cursor: pointer;
-  transition: border-color 0.2s ease, color 0.2s ease;
-}
-.companion-remove:hover { border-color: #c94b55; color: #c94b55; }
-.add-companion-btn {
-  margin-top: 10px;
-  font-size: 0.85rem;
+  gap: 16px;
+  font-size: 0.78rem;
   font-weight: 600;
-  color: var(--sage-dark);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px 0;
+  color: var(--ink-soft);
+  padding: 0 2px;
 }
-.add-companion-btn:hover { text-decoration: underline; }
+@media (max-width: 560px) { .guest-rows-header { display: none; } }
+.guest-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 560px) { .guest-row { grid-template-columns: 1fr; } }
 
 .confirmation-box {
   display: none;
