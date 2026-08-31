@@ -493,10 +493,12 @@ function initGuestRows() {
 
     row.innerHTML =
       '<div class="field">' +
+        '<label>Full Name</label>' +
         '<input type="text" ' + nameAttrs + ' placeholder="Guest ' + (index + 1) + ' full name" maxlength="80" required>' +
         '<span class="error-msg">Please enter a name.</span>' +
       '</div>' +
       '<div class="field">' +
+        '<label>Service</label>' +
         '<select ' + serviceAttrs + ' required></select>' +
         '<span class="error-msg">Please choose a service.</span>' +
       '</div>';

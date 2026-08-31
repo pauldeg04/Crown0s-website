@@ -728,10 +728,9 @@ p { margin: 0 0 1em; color: var(--ink-soft); }
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 20px;
 }
-@media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } }
 
 /* min-width: 0 overrides the grid item default of min-width: auto —
    without it, a <select> whose longest option text is wide (e.g. a long
@@ -875,22 +874,11 @@ input[type="date"] {
    "companion"/"companionService" field names so getCompanions() and the
    Cloud Function payload shape are unchanged. */
 .guest-rows { display: flex; flex-direction: column; gap: 12px; }
-.guest-rows-header {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--ink-soft);
-  padding: 0 2px;
-}
-@media (max-width: 560px) { .guest-rows-header { display: none; } }
 .guest-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 8px;
 }
-@media (max-width: 560px) { .guest-row { grid-template-columns: 1fr; } }
 
 .confirmation-box {
   display: none;
