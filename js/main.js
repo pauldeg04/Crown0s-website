@@ -424,7 +424,8 @@ function buildServiceSelectHtml(services) {
     // "Name (60mins) (60 mins)". The value stays the exact name,
     // unstripped, since that's what has to match crownServiceMasterList.
     const displayName = service.name.replace(/\s*\(\d+\s*mins?\)\s*$/i, "");
-    select.appendChild(new Option(`${displayName} (${service.duration} mins)`, service.name));
+    const categorySuffix = service.category ? ` - ${service.category}` : "";
+    select.appendChild(new Option(`${displayName} (${service.duration} mins)${categorySuffix}`, service.name));
   });
 
   select.appendChild(new Option("Not sure yet — recommend for me", "Not sure yet"));

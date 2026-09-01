@@ -4,6 +4,27 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-01 — Booking page Service dropdown shows category
+
+**Requested by:** User — wants each option in the booking form's Service
+dropdown to show its category, e.g. `Crown Reset (25 mins) - Head Spa`,
+`The Reset Duo (85 mins) - Combo`.
+
+- [js/main.js](js/main.js): `buildServiceSelectHtml()` now appends
+  ` - {category}` to each option's label when the live
+  `getBookableServices` Cloud Function (CrownOS) returns one, matching
+  the format above.
+- [book.html](book.html): the built-in `#serviceOptionsTemplate` fallback
+  (used if the live call fails) now carries the same `- Category` suffix
+  for every option, sourced from the actual categories in CrownOS's
+  Service Master List at the time of writing.
+- Depends on a matching CrownOS change (`getBookableServices` now returns
+  `category`) — see that project's own work log.
+
+**Status:** Deployed to production (`crownheadspa.web.app`).
+
+---
+
 ## 2026-09-01 — Service category tags, Kiddie Calm Deals section removed
 
 **Requested by:** User — wanted each service on
