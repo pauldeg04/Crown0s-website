@@ -4,6 +4,33 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-01 — Service category tags, Kiddie Calm Deals section removed
+
+**Requested by:** User — wanted each service on
+[services.html](services.html) to show its category so clients can
+identify it more easily, and asked to temporarily remove the Kiddie Calm
+Deals section.
+
+- [services.html](services.html): every service item's title now carries
+  a small category tag — **Head Spa** (Pure Head Spa section), **Combo**
+  (Head Spa + Massage Combos section), **Massage** (Pure Body Massage
+  section) — matching the category naming used in CrownOS's List of
+  Services (`Package` was recently renamed to `Combo` there too).
+- Removed the **Kiddie Calm Deals** section (Little Crown Head Spa, Dad or
+  Mom & Mini Duo, Family Calm Package) — "muna" (for now), per the user.
+- [css/style.css](css/style.css): added `.service-category-tag`, a small
+  pill next to each service title, styled distinctly from the existing
+  `.badge` ("Most Popular") so the two don't read as the same thing.
+
+**Note:** the homepage ([index.html](index.html)) still has a "Kiddie
+Package" promo card linking to Services — not touched, since it wasn't
+part of this request, but it now points to a page with no Kiddie section
+on it. Flag if that should also come down.
+
+**Status:** Deployed to production (`crownheadspa.web.app`).
+
+---
+
 ## 2026-08-31 — Booking form field order and layout
 
 **Requested by:** User — wanted the fields on the [book.html](book.html)
