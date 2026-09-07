@@ -4,6 +4,34 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-07 — Comfort Treat promo popup on booking page
+
+**Requested by:** User — wants the new "Comfort Treat" poster (hot
+chocolate with marshmallows and graham crackers) to pop up on the booking
+page, the same way the extended opening rates promo did before.
+
+- Re-added the promo popup pattern (markup/CSS/JS) that was removed on
+  2026-08-31, now pointing at the new poster.
+- [images/promo-comfort-treat.jpg](images/promo-comfort-treat.jpg): new
+  poster, re-encoded from the 2.2 MB source PNG to a 600×900 JPEG
+  (~166 KB).
+- [book.html](book.html): `#promoModal` markup restored, with alt text
+  and an sr-only heading describing the Comfort Treat offer, and a CTA
+  reading "Book Now & Treat Yourself".
+- [css/style.css](css/style.css): `.promo-modal*` rules restored
+  unchanged from the prior implementation.
+- [js/main.js](js/main.js): `initPromoModal()` restored unchanged —
+  opens once per browser session (`sessionStorage`), closable via the X,
+  backdrop, Escape, or "Maybe later".
+- Note: this repo also has other unrelated uncommitted work in progress
+  (clean URLs, homepage hero redesign, WhatsApp chat option, booking
+  form copy tweaks) spanning most pages. That work was left untouched
+  and unstaged — only the promo popup's own hunks were committed here.
+
+**Status:** Deployed to production (`crownheadspa.web.app`).
+
+---
+
 ## 2026-09-01 — Booking page Service dropdown shows category
 
 **Requested by:** User — wants each option in the booking form's Service
