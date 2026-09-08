@@ -4,6 +4,23 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-08 — Comfort Treat poster swapped to updated design
+
+**Requested by:** User — sent a revised Comfort Treat poster (graham
+crackers with chocolate-dipped pretzel sticks, "soft marshmallows and
+crispy graham crackers" copy) to replace the first version.
+
+- [images/promo-comfort-treat.jpg](images/promo-comfort-treat.jpg):
+  replaced in place with the new poster, same encoding (600×900 JPEG).
+- [book.html](book.html): alt text and the sr-only dialog heading
+  updated to match the new poster's wording ("soft marshmallows and
+  crispy graham crackers" instead of "marshmallows and graham
+  crackers" / "crunchy graham crackers, and sweet marshmallow bites").
+
+**Status:** Deployed to production (`crownheadspa.web.app`).
+
+---
+
 ## 2026-09-07 — Comfort Treat promo popup on booking page
 
 **Requested by:** User — wants the new "Comfort Treat" poster (hot
