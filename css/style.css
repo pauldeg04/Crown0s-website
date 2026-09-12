@@ -24,6 +24,21 @@
   --radius-sm: 10px;
   --font-heading: "Cinzel", "Georgia", serif;
   --font-body: "Inter", "Segoe UI", Arial, sans-serif;
+
+  /* Moody-luxe accents — pulled from the branches themselves: charcoal
+     treatment-room walls, warm wood reception panelling, and the colored
+     ambient glow lighting used in the treatment cubicles. Used only on
+     "accent" sections (hero, page-hero, CTA band) — everyday reading
+     sections stay on the light cream palette above for legibility. */
+  --charcoal: #17140f;
+  --charcoal-deep: #0c0a07;
+  --wood: #6b4a2b;
+  --wood-light: #9c7245;
+  --cream-on-dark: #f2ece0;
+  --ink-on-dark: rgba(242, 236, 224, 0.72);
+  --glow-purple: #8b5cf6;
+  --glow-blue: #38bdf8;
+  --glow-green: #34d399;
 }
 
 * { box-sizing: border-box; }
@@ -290,10 +305,35 @@ p { margin: 0 0 1em; color: var(--ink-soft); }
 .hero {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(150deg, var(--sage-light) 0%, var(--cream) 55%, var(--cream-deep) 100%);
+  background:
+    radial-gradient(560px 420px at 14% 18%, rgba(139, 92, 246, 0.20), transparent 65%),
+    radial-gradient(620px 480px at 92% 82%, rgba(56, 189, 248, 0.16), transparent 60%),
+    linear-gradient(155deg, var(--charcoal-deep) 0%, var(--charcoal) 48%, #241d13 100%);
 }
 
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0 2px, transparent 2px 26px);
+  mask-image: linear-gradient(90deg, black, transparent 38%);
+  -webkit-mask-image: linear-gradient(90deg, black, transparent 38%);
+}
+
+.hero .eyebrow { color: var(--gold); }
+.hero h1, .hero .lede { color: var(--cream-on-dark); }
+.hero .lede { color: var(--ink-on-dark); }
+
+.hero .btn-outline {
+  border-color: rgba(242, 236, 224, 0.55);
+  color: var(--cream-on-dark);
+}
+.hero .btn-outline:hover { background: var(--cream-on-dark); color: var(--charcoal-deep); }
+
 .hero-inner {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: 1.1fr 0.9fr;
   align-items: center;
@@ -311,6 +351,50 @@ p { margin: 0 0 1em; color: var(--ink-soft); }
 }
 
 .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 28px; }
+
+/* Promo pills — surfaces the standing offers (first-timer, VIP) right in the
+   hero instead of leaving guests to discover them on the Promos page. */
+.hero-promos {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+.promo-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px 8px 8px;
+  border-radius: 999px;
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  font-size: 0.82rem;
+  color: var(--cream-on-dark);
+}
+.promo-pill strong {
+  background: var(--gold);
+  color: var(--charcoal-deep);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.hero-reassurance {
+  margin-top: 14px;
+  font-size: 0.84rem;
+  color: var(--ink-on-dark);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.hero-reassurance svg { width: 15px; height: 15px; color: var(--gold); flex-shrink: 0; }
+
+/* Hero trust row (rating pulled live from Google Reviews via getGoogleReviews).
+   Hidden until initHeroTrust() in main.js has data to show, so guests never
+   see an empty/loading row. */
+.trust-row[hidden] { display: none; }
 
 .hero-visual {
   position: relative;
@@ -358,12 +442,16 @@ p { margin: 0 0 1em; color: var(--ink-soft); }
   flex-wrap: wrap;
   margin-top: 40px;
   padding-top: 28px;
-  border-top: 1px solid rgba(20, 17, 10,0.08);
+  border-top: 1px solid rgba(242, 236, 224, 0.14);
 }
 
 .trust-item { display: flex; align-items: baseline; gap: 8px; }
-.trust-item strong { font-family: var(--font-heading); font-size: 1.6rem; color: var(--rose-gold-dark); }
-.trust-item span { font-size: 0.85rem; color: var(--ink-soft); }
+.trust-item strong { font-family: var(--font-heading); font-size: 1.6rem; color: var(--gold); }
+.trust-item span { font-size: 0.85rem; color: var(--ink-on-dark); }
+
+.hero-visual {
+  border: 1px solid rgba(212, 175, 55, 0.25);
+}
 
 @media (max-width: 860px) {
   .hero-inner { grid-template-columns: 1fr; padding-top: 48px; }
@@ -861,6 +949,19 @@ input[type="date"] {
 }
 .booking-notice p + p { margin-top: 6px; }
 
+/* Lighter-weight than .booking-notice — used for the "no deposit" and
+   response-time reassurances so they read as helpful info, not warnings. */
+.booking-hint {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  margin: 0 0 22px;
+}
+.booking-hint svg { width: 18px; height: 18px; flex: 0 0 18px; margin-top: 2px; color: var(--gold-dark); }
+.booking-hint strong { color: var(--ink); }
+
 /* Hiring is handled over the phone rather than through a form or an inbox, so
    the careers page ends on the branch numbers instead of an "Apply Now" button. */
 .careers-inquire {
@@ -951,14 +1052,21 @@ input[type="date"] {
    ========================================================================== */
 
 .cta-band {
-  background: linear-gradient(135deg, var(--sage-dark), var(--rose-gold-dark));
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(420px 320px at 15% 20%, rgba(139, 92, 246, 0.22), transparent 65%),
+    radial-gradient(460px 340px at 90% 85%, rgba(56, 189, 248, 0.16), transparent 62%),
+    linear-gradient(135deg, var(--charcoal), var(--charcoal-deep));
+  border: 1px solid rgba(212, 175, 55, 0.2);
   border-radius: var(--radius-lg);
   padding: 56px;
   text-align: center;
-  color: var(--white);
+  color: var(--cream-on-dark);
 }
-.cta-band h2 { color: var(--white); }
-.cta-band p { color: rgba(255,255,255,0.85); max-width: 520px; margin: 0 auto 28px; }
+.cta-band > * { position: relative; z-index: 1; }
+.cta-band h2 { color: var(--cream-on-dark); }
+.cta-band p { color: var(--ink-on-dark); max-width: 520px; margin: 0 auto 28px; }
 .cta-band .hero-cta { justify-content: center; }
 
 /* ==========================================================================
@@ -966,10 +1074,16 @@ input[type="date"] {
    ========================================================================== */
 
 .site-footer {
-  background: #14110b;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(520px 360px at 85% 0%, rgba(139, 92, 246, 0.08), transparent 60%),
+    var(--charcoal-deep);
+  border-top: 1px solid rgba(212, 175, 55, 0.18);
   color: #e6e0d2;
   padding: 64px 0 28px;
 }
+.site-footer .container { position: relative; z-index: 1; }
 .footer-grid {
   display: grid;
   grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
@@ -1033,15 +1147,22 @@ input[type="date"] {
    ========================================================================== */
 
 .page-hero {
-  background: linear-gradient(150deg, var(--sage-light), var(--cream));
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(480px 360px at 88% 12%, rgba(139, 92, 246, 0.18), transparent 62%),
+    radial-gradient(520px 400px at 8% 92%, rgba(52, 211, 153, 0.12), transparent 60%),
+    linear-gradient(150deg, var(--charcoal-deep), var(--charcoal) 65%, #241d13 100%);
   padding: 64px 0 56px;
   text-align: center;
 }
-.page-hero .eyebrow { }
-.page-hero p { max-width: 620px; margin: 0 auto; }
+.page-hero .container { position: relative; z-index: 1; }
+.page-hero .eyebrow { color: var(--gold); }
+.page-hero h1 { color: var(--cream-on-dark); }
+.page-hero p { max-width: 620px; margin: 0 auto; color: var(--ink-on-dark); }
 
-.breadcrumb { font-size: 0.82rem; color: var(--ink-soft); margin-bottom: 14px; }
-.breadcrumb a { color: var(--sage-dark); }
+.breadcrumb { font-size: 0.82rem; color: var(--ink-on-dark); margin-bottom: 14px; }
+.breadcrumb a { color: var(--gold); }
 
 /* ==========================================================================
    Branch tabs (Testimonials — one Google Reviews widget per branch)
@@ -1423,11 +1544,14 @@ input[type="date"] {
 }
 .fb-chat-menu.open { display: flex; }
 .fb-chat-menu p {
-  margin: 0 0 2px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  color: var(--ink-soft);
+  margin: 6px 0 2px;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--gold-dark);
 }
+.fb-chat-menu p:first-child { margin-top: 0; }
 .fb-chat-menu a {
   display: flex;
   align-items: center;

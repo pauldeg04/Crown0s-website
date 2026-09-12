@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initGalleryLightbox();
   initBranchTabs();
   initGoogleReviews();
+  initHeroTrust();
   initCookieConsent();
   initFbChatWidget();
   initPromoModal();
@@ -298,6 +299,58 @@ function initGoogleReviews() {
           "Reviews are taking a moment to load. You can read them on Google in the meantime."
         );
       });
+    }
+  })();
+}
+
+/* ==========================================================================
+   Hero trust row (homepage)
+   Combines both branches' Google rating into one weighted score + total
+   review count, shown right in the hero. Stays hidden until real numbers
+   arrive — an empty or "0" trust row would hurt more than it helps.
+   ========================================================================== */
+function initHeroTrust() {
+  const row = document.getElementById("heroTrustRow");
+  if (!row) return;
+
+  (async () => {
+    try {
+      if (!window.firebase || !firebase.apps || firebase.apps.length === 0) {
+        throw new Error("Firebase not initialized");
+      }
+
+      const getGoogleReviews = firebase.functions().httpsCallable("getGoogleReviews");
+      const result = await getGoogleReviews();
+      const branches = (result.data && result.data.branches) || [];
+
+      const rated = branches.filter((b) => typeof b.rating === "number" && typeof b.reviewCount === "number" && b.reviewCount > 0);
+      if (rated.length === 0) return;
+
+      const totalReviews = rated.reduce((sum, b) => sum + b.reviewCount, 0);
+      const weightedRating = rated.reduce((sum, b) => sum + b.rating * b.reviewCount, 0) / totalReviews;
+
+      row.innerHTML = "";
+
+      const item1 = document.createElement("div");
+      item1.className = "trust-item";
+      const strong1 = document.createElement("strong");
+      strong1.textContent = weightedRating.toFixed(1) + "★";
+      const span1 = document.createElement("span");
+      span1.textContent = "Google rating";
+      item1.append(strong1, span1);
+
+      const item2 = document.createElement("div");
+      item2.className = "trust-item";
+      const strong2 = document.createElement("strong");
+      strong2.textContent = totalReviews.toLocaleString() + "+";
+      const span2 = document.createElement("span");
+      span2.textContent = "Happy guests";
+      item2.append(strong2, span2);
+
+      row.append(item1, item2);
+      row.hidden = false;
+    } catch (err) {
+      console.warn("Could not load hero trust row:", err);
     }
   })();
 }
@@ -714,11 +767,18 @@ function initNavToggle() {
   });
 }
 
+/* Clean URLs (firebase.json: cleanUrls) mean location.pathname and the
+   nav links' href might each carry a ".html" or a trailing slash or
+   neither — strip both down to a bare page name before comparing so this
+   keeps working regardless of which form is currently in the address bar. */
 function markActiveNavLink() {
-  const current = (location.pathname.split("/").pop() || "index.html").toLowerCase();
+  const normalize = (path) =>
+    path.replace(/^\/+|\/+$/g, "").replace(/\.html$/i, "").toLowerCase();
+
+  const current = normalize(location.pathname) || "index";
   document.querySelectorAll(".nav-links a").forEach((link) => {
-    const href = (link.getAttribute("href") || "").toLowerCase();
-    if (href === current || (current === "" && href === "index.html")) {
+    const href = normalize(link.getAttribute("href") || "") || "index";
+    if (href === current) {
       link.classList.add("active");
     }
   });

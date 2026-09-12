@@ -8,9 +8,10 @@
       "**/node_modules/**",
       "*.pptx",
       "*.txt",
+      "!robots.txt",
       "*.md"
     ],
-    "cleanUrls": false,
+    "cleanUrls": true,
     "headers": [
       {
         "source": "**/*.@(js|css)",
@@ -20,6 +21,18 @@
       },
       {
         "source": "**/*.@(html|json)",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache" }
+        ]
+      },
+      {
+        "source": "/",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache" }
+        ]
+      },
+      {
+        "source": "/@(index|about|services|branches|gallery|promos|testimonials|contact|careers|book|privacy|head-spa-binan|head-spa-calamba)",
         "headers": [
           { "key": "Cache-Control", "value": "no-cache" }
         ]

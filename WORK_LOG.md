@@ -4,6 +4,38 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-12 — Local SEO: homepage copy + Biñan/Calamba landing pages
+
+**Requested by:** User — forwarded SEO consultant suggestions (homepage
+title/hero copy, plus a proposed `/head-spa-laguna` page) and asked for
+analysis before implementing.
+
+- [index.html](index.html): homepage `<title>`, meta description, and
+  Open Graph/Twitter tags updated to `Crown Head Spa | Head Spa &
+  Massage in Laguna` (dropped the consultant's "Best" claim — no
+  reviews/ranking on the page to back an unsubstantiated superlative).
+  Added a descriptive sentence under the existing "Your Royal
+  Relaxation Awaits." hero headline naming the location and services,
+  without replacing the branding copy.
+- Instead of a single `/head-spa-laguna` page (which would have
+  cannibalized keywords already targeted by [branches.html](branches.html)
+  and the homepage), added two dedicated per-branch landing pages:
+  [head-spa-binan.html](head-spa-binan.html) and
+  [head-spa-calamba.html](head-spa-calamba.html), each with unique
+  content, its own title/meta/OG tags, and `HealthAndBeautyBusiness`
+  JSON-LD for its address/phone/hours.
+- [branches.html](branches.html): added an internal link from each
+  branch card to its new head-spa-{branch} landing page.
+- Added [sitemap.xml](sitemap.xml) and [robots.txt](robots.txt) (none
+  existed before) so the new pages get crawled/indexed.
+- [firebase.json](firebase.json): added the two new page routes to the
+  no-cache header list, and excepted `robots.txt` from the `*.txt`
+  ignore rule so it actually deploys.
+
+**Status:** Deployed to production (`crownheadspa.web.app`).
+
+---
+
 ## 2026-09-08 — Comfort Treat poster swapped to updated design
 
 **Requested by:** User — sent a revised Comfort Treat poster (graham

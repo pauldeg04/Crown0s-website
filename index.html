@@ -3,24 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crown Head Spa | Premium Head Spa Rituals in Laguna</title>
-<meta name="description" content="Crown Head Spa offers calming, premium head spa treatments across our Biñan and Calamba branches. Book your relaxing scalp treatment online today.">
+<title>Crown Head Spa | Head Spa &amp; Massage in Laguna</title>
+<meta name="description" content="Looking for a relaxing head spa in Laguna? Crown Head Spa offers premium head spa treatments, body massage, and wellness combos in Biñan and Calamba. Book online today.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Crown Head Spa">
-<meta property="og:title" content="Crown Head Spa | Premium Head Spa Rituals in Laguna">
-<meta property="og:description" content="Crown Head Spa offers calming, premium head spa treatments across our Biñan and Calamba branches. Book your relaxing scalp treatment online today.">
+<meta property="og:title" content="Crown Head Spa | Head Spa &amp; Massage in Laguna">
+<meta property="og:description" content="Looking for a relaxing head spa in Laguna? Crown Head Spa offers premium head spa treatments, body massage, and wellness combos in Biñan and Calamba. Book online today.">
 <meta property="og:url" content="https://crownheadspa.com/">
 <meta property="og:image" content="https://crownheadspa.com/images/og-preview.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="444">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Crown Head Spa | Premium Head Spa Rituals in Laguna">
-<meta name="twitter:description" content="Crown Head Spa offers calming, premium head spa treatments across our Biñan and Calamba branches. Book your relaxing scalp treatment online today.">
+<meta name="twitter:title" content="Crown Head Spa | Head Spa &amp; Massage in Laguna">
+<meta name="twitter:description" content="Looking for a relaxing head spa in Laguna? Crown Head Spa offers premium head spa treatments, body massage, and wellness combos in Biñan and Calamba. Book online today.">
 <meta name="twitter:image" content="https://crownheadspa.com/images/og-preview.jpg">
 <link rel="icon" href="images/favicon-32.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
+<script src="js/firebase-init.js"></script>
 </head>
 <body>
 
@@ -38,25 +41,25 @@
 
 <header class="site-header">
   <div class="nav-wrap">
-    <a href="index.html" class="brand">
+    <a href="/" class="brand">
       <img src="images/crown-mark.png" alt="Crown Head Spa crest">
       <span class="brand-text">Crown Head Spa</span>
     </a>
     <nav>
       <ul class="nav-links">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="about.html">About</a></li>
-        <li><a href="services.html">Services</a></li>
-        <li><a href="branches.html">Branches</a></li>
-        <li><a href="gallery.html">Gallery</a></li>
-        <li><a href="promos.html">Promos</a></li>
-        <li><a href="testimonials.html">Testimonials</a></li>
-        <li><a href="contact.html">Contact / FAQ</a></li>
-        <li><a href="careers.html">Careers</a></li>
+        <li><a href="/">Home</a></li>
+        <li><a href="about">About</a></li>
+        <li><a href="services">Services</a></li>
+        <li><a href="branches">Branches</a></li>
+        <li><a href="gallery">Gallery</a></li>
+        <li><a href="promos">Promos</a></li>
+        <li><a href="testimonials">Testimonials</a></li>
+        <li><a href="contact">Contact / FAQ</a></li>
+        <li><a href="careers">Careers</a></li>
       </ul>
     </nav>
     <div class="nav-actions">
-      <a href="book.html" class="btn btn-primary"><span>Book Now</span></a>
+      <a href="book" class="btn btn-primary"><span>Book Now</span></a>
       <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -71,10 +74,24 @@
       <div>
         <h1>Your Royal Relaxation Awaits.</h1>
         <p class="lede">New Experience Near Home.</p>
-        <div class="hero-cta">
-          <a href="book.html" class="btn btn-primary">Book an Appointment</a>
-          <a href="services.html" class="btn btn-outline">View Services</a>
+        <p class="lede" style="font-size:1rem;opacity:.85;">Looking for a relaxing head spa in Laguna? Crown Head Spa offers premium head spa treatments, body massage, and wellness experiences in Biñan and Calamba.</p>
+
+        <div class="hero-promos">
+          <span class="promo-pill"><strong>30% OFF</strong> Your first visit</span>
+          <span class="promo-pill"><strong>50% OFF</strong> For VIP cardholders</span>
         </div>
+
+        <div class="hero-cta">
+          <a href="book" class="btn btn-primary">Book an Appointment</a>
+          <a href="services" class="btn btn-outline">View Services</a>
+        </div>
+
+        <p class="hero-reassurance">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          No deposit needed — you only pay at the spa
+        </p>
+
+        <div class="trust-row" id="heroTrustRow" hidden></div>
       </div>
       <div class="hero-visual">
         <img src="images/jade-eyemask-treatment.jpg" alt="Guest receiving a jade eyemask head spa treatment" style="width:100%;height:100%;object-fit:cover;">
@@ -126,25 +143,25 @@
           <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3s6 6.5 6 11a6 6 0 1 1-12 0c0-4.5 6-11 6-11Z"/></svg></div>
           <h3>Signature Head Spa</h3>
           <p>Deep scalp cleansing, massage, and steam therapy that resets your whole nervous system.</p>
-          <a href="services.html" class="btn btn-outline">See full list</a>
+          <a href="services" class="btn btn-outline">See full list</a>
         </div>
         <div class="card">
           <div class="icon-badge rose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 5c-2.5 4.5-9.5 9-9.5 9Z"/></svg></div>
           <h3>Pure Body Massage</h3>
           <p>Crown Relax, Relief, and Recovery massages — choose your intensity, choose your relaxation.</p>
-          <a href="services.html" class="btn btn-outline">See full list</a>
+          <a href="services" class="btn btn-outline">See full list</a>
         </div>
         <div class="card">
           <div class="icon-badge gold"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 5.8L20 10l-6.2 2.2L12 18l-1.8-5.8L4 10l6.2-2.2L12 2Z"/></svg></div>
           <h3>Combo Packages</h3>
           <p>Head spa paired with a full body massage — includes foot soak, hot towel, and complimentary tea.</p>
-          <a href="services.html" class="btn btn-outline">See full list</a>
+          <a href="services" class="btn btn-outline">See full list</a>
         </div>
         <div class="card">
           <div class="icon-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M6 21c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg></div>
           <h3>Kiddie Package</h3>
           <p>Gentle head spa treats for ages 5–12, plus family bundles with mom or dad.</p>
-          <a href="services.html" class="btn btn-outline">See full list</a>
+          <a href="services" class="btn btn-outline">See full list</a>
         </div>
       </div>
     </div>
@@ -162,7 +179,7 @@
           <div class="promo-body">
             <span class="promo-expiry">Standing offer — every first visit</span>
             <p>New guests enjoy 30% off any Pure Head Spa treatment.</p>
-            <a href="promos.html" class="btn btn-sage btn-block">See all promos</a>
+            <a href="promos" class="btn btn-sage btn-block">See all promos</a>
           </div>
         </div>
         <div class="promo-card">
@@ -170,7 +187,7 @@
           <div class="promo-body">
             <span class="promo-expiry">Ongoing offer for VIP cardholders</span>
             <p>VIP cardholders enjoy 50% off across our Pure Head Spa menu.</p>
-            <a href="promos.html" class="btn btn-sage btn-block">See all promos</a>
+            <a href="promos" class="btn btn-sage btn-block">See all promos</a>
           </div>
         </div>
       </div>
@@ -189,7 +206,7 @@
         <div class="gallery-tile"><img src="images/styling-station-black-stone-wall.jpg" alt="Styling station with black stone wall and round mirrors" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;"></div>
       </div>
       <div class="text-center" style="margin-top:32px;">
-        <a href="gallery.html" class="btn btn-outline">View Full Gallery</a>
+        <a href="gallery" class="btn btn-outline">View Full Gallery</a>
       </div>
     </div>
   </section>
@@ -200,7 +217,7 @@
         <h2>Stress Ends Here</h2>
         <p>Choose your branch, pick a service, and reserve your relaxation — it only takes a minute.</p>
         <div class="hero-cta">
-          <a href="book.html" class="btn btn-outline-light">Book an Appointment</a>
+          <a href="book" class="btn btn-outline-light">Book an Appointment</a>
         </div>
       </div>
     </div>
@@ -224,20 +241,20 @@
       <div class="footer-col">
         <h4>Explore</h4>
         <ul>
-          <li><a href="about.html">About Us</a></li>
-          <li><a href="services.html">Services</a></li>
-          <li><a href="promos.html">Promos</a></li>
-          <li><a href="gallery.html">Gallery</a></li>
-          <li><a href="testimonials.html">Testimonials</a></li>
+          <li><a href="about">About Us</a></li>
+          <li><a href="services">Services</a></li>
+          <li><a href="promos">Promos</a></li>
+          <li><a href="gallery">Gallery</a></li>
+          <li><a href="testimonials">Testimonials</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4>Visit</h4>
         <ul>
-          <li><a href="branches.html">Our Branches</a></li>
-          <li><a href="book.html">Book an Appointment</a></li>
-          <li><a href="contact.html">Contact &amp; FAQ</a></li>
-          <li><a href="careers.html">Careers</a></li>
+          <li><a href="branches">Our Branches</a></li>
+          <li><a href="book">Book an Appointment</a></li>
+          <li><a href="contact">Contact &amp; FAQ</a></li>
+          <li><a href="careers">Careers</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -248,24 +265,41 @@
     </div>
     <div class="footer-bottom">
       <span>&copy; 2026 Crown Head Spa. All rights reserved.</span>
-      <span class="footer-legal"><a href="privacy.html">Privacy Policy</a></span>
+      <span class="footer-legal"><a href="privacy">Privacy Policy</a></span>
     </div>
   </div>
 </footer>
 
 <div class="fb-chat-widget">
   <div class="fb-chat-menu">
-    <p>Chat with us on Messenger</p>
+    <p>Biñan Branch</p>
     <a href="https://m.me/584649091394403" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.4"/></svg>
-      Biñan Branch
+      Messenger
     </a>
+    <a href="https://wa.me/639395884068" target="_blank" rel="noopener">
+      <svg style="color:#25D366;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      WhatsApp
+    </a>
+    <a href="viber://chat?number=%2B639395884068" target="_blank" rel="noopener">
+      <svg style="color:#7360F2;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      Viber
+    </a>
+    <p>Calamba Branch</p>
     <a href="https://m.me/924236430782142" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.4"/></svg>
-      Calamba Branch
+      Messenger
+    </a>
+    <a href="https://wa.me/639614402807" target="_blank" rel="noopener">
+      <svg style="color:#25D366;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      WhatsApp
+    </a>
+    <a href="viber://chat?number=%2B639614402807" target="_blank" rel="noopener">
+      <svg style="color:#7360F2;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      Viber
     </a>
   </div>
-  <button class="fb-chat-toggle" type="button" aria-label="Chat with us on Messenger">
+  <button class="fb-chat-toggle" type="button" aria-label="Chat with us">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.15 2 11.26c0 2.91 1.45 5.51 3.73 7.21V22l3.41-1.87c.91.25 1.87.39 2.86.39 5.52 0 10-4.15 10-9.26S17.52 2 12 2Zm1.02 12.47-2.55-2.72-4.98 2.72 5.48-5.82 2.61 2.72 4.92-2.72-5.48 5.82Z"/></svg>
   </button>
 </div>
