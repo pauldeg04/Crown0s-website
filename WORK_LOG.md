@@ -4,6 +4,32 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-18 — Updated branch hours to 1PM–10PM for both branches
+
+**Requested by:** User — Biñan and Calamba branches are now both open
+daily from 1PM to 10PM (Biñan's hours moved from 10AM; Calamba's start
+time moved from 12PM).
+
+- Updated the shared footer hours line across every page
+  ([index.html](index.html), [about.html](about.html),
+  [services.html](services.html), [branches.html](branches.html),
+  [gallery.html](gallery.html), [promos.html](promos.html),
+  [testimonials.html](testimonials.html), [contact.html](contact.html),
+  [careers.html](careers.html), [book.html](book.html),
+  [privacy.html](privacy.html), [head-spa-binan.html](head-spa-binan.html),
+  [head-spa-calamba.html](head-spa-calamba.html)) to
+  "Biñan open daily 1PM–10PM · Calamba open daily 1PM–10PM".
+- [branches.html](branches.html): updated each branch card's hours line
+  to "Open daily, 1:00 PM – 10:00 PM".
+- [contact.html](contact.html): updated the FAQ hours line to match.
+- [book.html](book.html): updated the "business hours" copy in the
+  booking confirmation notice (both the inline note and the success
+  message) to reflect 1PM–10PM.
+- [head-spa-binan.html](head-spa-binan.html) and
+  [head-spa-calamba.html](head-spa-calamba.html): updated the
+  `HealthAndBeautyBusiness` JSON-LD `openingHours` to `Mo-Su 13:00-22:00`
+  and the body copy hours line to match.
+
 ## 2026-09-12 — Local SEO: homepage copy + Biñan/Calamba landing pages
 
 **Requested by:** User — forwarded SEO consultant suggestions (homepage
