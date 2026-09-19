@@ -62,6 +62,10 @@ function initPromoCalendar() {
     return `${hour12}:${minute} ${suffix}`;
   }
 
+  function minutesToHHMM(total) {
+    return String(Math.floor(total / 60)).padStart(2, "0") + ":" + String(total % 60).padStart(2, "0");
+  }
+
   function timeToMinutes(hhmm) {
     const [hour, minute] = String(hhmm || "00:00").split(":").map(Number);
     return hour * 60 + minute;
@@ -88,42 +92,69 @@ function initPromoCalendar() {
 
     listEl.classList.toggle("promo-bed-list-blocked", !!data.blocked);
 
-    listEl.innerHTML = data.beds
+    const PX_PER_MIN = 1.2;
+    const opening = timeToMinutes(data.openingTime);
+    const closing = Math.max(opening + 60, timeToMinutes(data.closingTime));
+    const totalHeight = (closing - opening) * PX_PER_MIN;
+    const y = (minute) => (Math.min(Math.max(minute, opening), closing) - opening) * PX_PER_MIN;
+
+    const hourMarks = [opening];
+    for (let m = Math.ceil((opening + 1) / 60) * 60; m < closing; m += 60) hourMarks.push(m);
+
+    const header = data.beds
+      .map((bed) => `
+        <div class="promo-grid-head-cell${bed.available ? "" : " promo-grid-head-off"}">
+          <strong>Bed ${bed.bed}</strong>
+          <small>${bed.available ? `${formatTime(bed.from)} – ${formatTime(bed.to)}` : "Not offered"}</small>
+        </div>`)
+      .join("");
+
+    const timeCol = hourMarks
+      .map((m) => `<div class="promo-grid-hour" style="top:${y(m)}px;">${formatTime(minutesToHHMM(m))}</div>`)
+      .join("");
+
+    const bedCols = data.beds
       .map((bed) => {
+        const shade = (from, to) =>
+          to > from
+            ? `<div class="promo-grid-off" style="top:${y(from)}px;height:${y(to) - y(from)}px;"></div>`
+            : "";
+
+        let off = "";
         if (!bed.available) {
-          return `
-            <div class="promo-bed-row">
-              <div class="promo-bed-label">Bed ${bed.bed}<span class="promo-bed-status promo-bed-status-off">Not offered today</span></div>
-            </div>
-          `;
+          off = shade(opening, closing);
+        } else {
+          off = shade(opening, timeToMinutes(bed.from)) + shade(timeToMinutes(bed.to), closing);
         }
 
-        const windowStart = timeToMinutes(bed.from);
-        const windowEnd = Math.max(windowStart, timeToMinutes(bed.to));
-        const span = Math.max(1, windowEnd - windowStart);
+        const occupied = bed.available
+          ? (bed.occupied || [])
+              .map((range) => {
+                const start = Math.max(timeToMinutes(range.startTime), opening);
+                const end = Math.min(timeToMinutes(range.endTime), closing);
+                if (end <= start) return "";
+                return `<div class="promo-grid-occupied" style="top:${y(start)}px;height:${y(end) - y(start)}px;">Occupied</div>`;
+              })
+              .join("")
+          : "";
 
-        const segments = (bed.occupied || [])
-          .map((range) => {
-            const start = Math.min(Math.max(timeToMinutes(range.startTime), windowStart), windowEnd);
-            const end = Math.min(Math.max(timeToMinutes(range.endTime), windowStart), windowEnd);
-
-            if (end <= start) return "";
-
-            const left = ((start - windowStart) / span) * 100;
-            const width = ((end - start) / span) * 100;
-
-            return `<span class="promo-bed-occupied" style="left:${left}%;width:${width}%;"></span>`;
-          })
-          .join("");
-
-        return `
-          <div class="promo-bed-row">
-            <div class="promo-bed-label">Bed ${bed.bed}<span class="promo-bed-status promo-bed-status-open">${formatTime(bed.from)} – ${formatTime(bed.to)}</span></div>
-            <div class="promo-bed-bar">${segments}</div>
-          </div>
-        `;
+        return `<div class="promo-grid-col" style="height:${totalHeight}px;">${off}${occupied}</div>`;
       })
       .join("");
+
+    listEl.innerHTML = `
+      <div class="promo-grid-scroll">
+        <div class="promo-grid" style="--bed-count:${data.beds.length};--hour-height:${PX_PER_MIN * 60}px;">
+          <div class="promo-grid-head">
+            <div class="promo-grid-head-cell promo-grid-corner">Time</div>
+            ${header}
+          </div>
+          <div class="promo-grid-body">
+            <div class="promo-grid-time" style="height:${totalHeight}px;">${timeCol}</div>
+            ${bedCols}
+          </div>
+        </div>
+      </div>`;
   }
 
   let requestToken = 0;

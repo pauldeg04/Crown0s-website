@@ -4,6 +4,15 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-19 (3) — Payday Sale promo: calendar restyled to match CrownOS grid
+
+**Requested by:** User — make the public calendar look like the CrownOS Payday Sale grid.
+
+- [js/payday-promo.js](js/payday-promo.js): replaced the one-bar-per-bed rows with a CrownOS-style timeline grid — navy bed header cells (Bed N + From–To window, red when a bed isn't offered), hour labels down the side, hourly gridlines, grey striped "Occupied" blocks, hatched shading outside a bed's window. Still view-only; same `getPaydaySaleAvailability` data.
+- [css/style.css](css/style.css): new `.promo-grid*` rules replace the old `.promo-bed-bar` ones; scrolls sideways on narrow screens.
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/payday-promo.
+
 ## 2026-09-19 (2) — Payday Sale promo: bed calendar now shows on blocked dates too
 
 **Requested by:** User — wanted guests to be able to view the calendar even when a date is blocked (before, a blocked date showed only a message and no calendar).
