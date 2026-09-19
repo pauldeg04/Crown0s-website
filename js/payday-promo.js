@@ -92,7 +92,7 @@ function initPromoCalendar() {
 
     listEl.classList.toggle("promo-bed-list-blocked", !!data.blocked);
 
-    const PX_PER_MIN = 1.2;
+    const PX_PER_MIN = 0.6;
     const opening = timeToMinutes(data.openingTime);
     const closing = Math.max(opening + 60, timeToMinutes(data.closingTime));
     const totalHeight = (closing - opening) * PX_PER_MIN;
@@ -103,7 +103,7 @@ function initPromoCalendar() {
 
     const header = data.beds
       .map((bed) => `
-        <div class="promo-grid-head-cell${bed.available ? "" : " promo-grid-head-off"}">
+        <div class="promo-grid-head-cell${bed.available ? "" : " promo-grid-head-off"}" title="Bed ${bed.bed}: ${bed.available ? `${formatTime(bed.from)} – ${formatTime(bed.to)}` : "Not offered"}">
           <strong>Bed ${bed.bed}</strong>
           <small>${bed.available ? `${formatTime(bed.from)} – ${formatTime(bed.to)}` : "Not offered"}</small>
         </div>`)
@@ -133,7 +133,7 @@ function initPromoCalendar() {
                 const start = Math.max(timeToMinutes(range.startTime), opening);
                 const end = Math.min(timeToMinutes(range.endTime), closing);
                 if (end <= start) return "";
-                return `<div class="promo-grid-occupied" style="top:${y(start)}px;height:${y(end) - y(start)}px;">Occupied</div>`;
+                return `<div class="promo-grid-occupied" title="Occupied" style="top:${y(start)}px;height:${y(end) - y(start)}px;"></div>`;
               })
               .join("")
           : "";

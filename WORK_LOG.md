@@ -4,6 +4,15 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-19 (7) — Payday Sale promo: calendar cells shrunk to 50%
+
+**Requested by:** User — make each calendar box 50% smaller, horizontally and vertically.
+
+- [js/payday-promo.js](js/payday-promo.js): `PX_PER_MIN` 1.2 → 0.6 (hour row 72px → 36px). The bed's From–To window moved into the header's tooltip and the "Occupied" label into a tooltip, since neither fits the smaller cells.
+- [css/style.css](css/style.css): bed columns fixed at 34px (was ~64px), time column 62px, smaller header/marker text.
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/payday-promo.
+
 ## 2026-09-19 (6) — Payday Sale promo: form moved above the calendar
 
 **Requested by:** User — swap the positions so the booking form is on top.

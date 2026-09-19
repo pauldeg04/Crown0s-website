@@ -1085,11 +1085,11 @@ input[type="date"] {
 
 /* CrownOS-style timeline grid: bed columns, hours down the side. */
 .promo-grid-scroll { overflow-x: auto; border: 1px solid rgba(20, 17, 10, 0.12); border-radius: var(--radius-sm); }
-.promo-grid { min-width: 560px; }
+.promo-grid { width: max-content; min-width: 100%; }
 .promo-grid-head,
 .promo-grid-body {
   display: grid;
-  grid-template-columns: 78px repeat(var(--bed-count, 1), 1fr);
+  grid-template-columns: 62px repeat(var(--bed-count, 1), 34px);
 }
 .promo-grid-head-cell {
   display: flex;
@@ -1097,14 +1097,14 @@ input[type="date"] {
   align-items: center;
   justify-content: center;
   gap: 2px;
-  padding: 10px 6px;
+  padding: 8px 2px;
   background: #0B1849;
   color: #fff;
   border-right: 1px solid rgba(255, 255, 255, 0.18);
   text-align: center;
-  font-size: 0.8rem;
+  font-size: 0.66rem;
 }
-.promo-grid-head-cell small { font-size: 0.68rem; font-weight: 500; opacity: 0.8; }
+.promo-grid-head-cell small { display: none; }
 .promo-grid-head-off { background: #7a2727; }
 .promo-grid-time {
   position: relative;
@@ -1138,6 +1138,10 @@ input[type="date"] {
 .promo-grid-col-pickable { cursor: pointer; }
 .promo-grid-col-pickable:hover { background-color: #fbf6e3; }
 .promo-grid-pick {
+  font-size: 0.56rem !important;
+  line-height: 1.05;
+  text-align: center;
+  padding: 0 1px;
   position: absolute;
   left: 3px;
   right: 3px;
@@ -1155,12 +1159,12 @@ input[type="date"] {
 }
 .promo-grid-occupied {
   position: absolute;
-  left: 3px;
-  right: 3px;
+  left: 2px;
+  right: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 7px;
+  border-radius: 4px;
   background-color: #5a5a5a;
   background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.08) 0, rgba(255, 255, 255, 0.08) 6px, transparent 6px, transparent 12px);
   color: rgba(255, 255, 255, 0.85);
