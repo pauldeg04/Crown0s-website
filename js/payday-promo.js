@@ -324,13 +324,30 @@ function initPromoCalendar() {
           .slice()
           .sort((a, b) => Math.abs(cols.indexOf(a) - clickIndex) - Math.abs(cols.indexOf(b) - clickIndex) || cols.indexOf(a) - cols.indexOf(b));
 
+        /* Tapping a spot that is already taken (occupied, or another
+           client's hold) must not select anything. */
+        const takenHere = (col.dataset.occupied || "")
+          .split(",")
+          .filter(Boolean)
+          .some((pair) => {
+            const [start, stop] = pair.split("-").map(Number);
+            return raw >= start && raw < stop;
+          });
+
+        if (takenHere) {
+          statusEl.textContent = "That spot is already taken or on hold — please tap an open (white) spot.";
+          return;
+        }
+
+        /* Guest 1 always sits on the bed that was tapped; the other guests
+           go on nearby beds. */
         const assign = (minute) => {
           const picked = [];
 
           const place = (index) => {
             if (index === guests) return true;
 
-            for (const candidate of bedOrder) {
+            for (const candidate of index === 0 ? [col] : bedOrder) {
               if (picked.includes(candidate) || !bedIsFree(candidate, minute, durations[index])) continue;
               picked.push(candidate);
               if (place(index + 1)) return true;
@@ -352,8 +369,11 @@ function initPromoCalendar() {
         }
 
         if (!assigned) {
-          statusEl.textContent =
-            `There aren't enough open beds at that time for ${guests} guest${guests === 1 ? "" : "s"} — each guest needs a bed free for their whole service. Please pick another time.`;
+          const guestOneFits = bedIsFree(col, Math.floor(raw / 60) * 60, durations[0]) || bedIsFree(col, Math.floor(raw / 60) * 60 + 60, durations[0]);
+
+          statusEl.textContent = guestOneFits
+            ? `There aren't enough open beds at that time for ${guests} guest${guests === 1 ? "" : "s"} — each guest needs a bed free for their whole service. Please pick another time.`
+            : `This bed isn't free for the full ${durations[0]} minutes from that time. Please tap another open spot.`;
           return;
         }
 

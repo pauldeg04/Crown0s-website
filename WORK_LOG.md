@@ -4,6 +4,14 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-20 (3) — Payday promo: can no longer tap an occupied/held spot
+
+**Reported by:** User — tapping a time that was already occupied still selected it and covered the existing card.
+
+- [js/payday-promo.js](js/payday-promo.js): tapping a spot that is occupied or on hold now selects nothing and says so. Guest 1 always sits on the bed tapped (previously the nearest free bed was used if the tapped one was taken — which is why a taken spot seemed to accept the tap); other guests still go on nearby free beds. If the tapped bed isn't free for the whole service, the message says that instead of the generic "not enough beds".
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/payday-promo.
+
 ## 2026-09-20 (2) — Fix: pressing Enter placed the voucher order
 
 **Reported by:** User — after typing a new Preferred Time and pressing Enter, the order was sent (thank-you box shown, 1-hour hold started) before the contact details were filled in.
