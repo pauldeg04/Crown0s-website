@@ -4,6 +4,16 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-19 (4) — Payday Sale promo: click the calendar to fill in Preferred Time
+
+**Requested by:** User — clients should click the calendar and have the form's Preferred Time fill in automatically.
+
+- [js/payday-promo.js](js/payday-promo.js): open stretches of a bed's column are now clickable (`attachPicking()`). A click snaps to the nearest 10 minutes, ignores occupied time, times outside the bed's window, past times today, and blocked dates, then fills `#promoFormTime`, drops a gold marker on the grid and shows "Selected … added to the form". The server still re-checks capacity on submit.
+- [payday-promo.html](payday-promo.html): hint copy changed from "for reference only" to "tap an open spot".
+- [css/style.css](css/style.css): pointer cursor/hover on open columns and `.promo-grid-pick` marker.
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/payday-promo.
+
 ## 2026-09-19 (3) — Payday Sale promo: calendar restyled to match CrownOS grid
 
 **Requested by:** User — make the public calendar look like the CrownOS Payday Sale grid.

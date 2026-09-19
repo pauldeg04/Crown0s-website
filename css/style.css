@@ -1135,6 +1135,24 @@ input[type="date"] {
   background-image: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.07) 0, rgba(0, 0, 0, 0.07) 6px, transparent 6px, transparent 12px);
   background-color: rgba(20, 17, 10, 0.04);
 }
+.promo-grid-col-pickable { cursor: pointer; }
+.promo-grid-col-pickable:hover { background-color: #fbf6e3; }
+.promo-grid-pick {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: var(--sage);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(20, 17, 10, 0.25);
+}
 .promo-grid-occupied {
   position: absolute;
   left: 3px;
