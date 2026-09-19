@@ -1141,7 +1141,7 @@ input[type="date"] {
   position: absolute;
   left: 3px;
   right: 3px;
-  height: 26px;
+  opacity: 0.92;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1747,3 +1747,5 @@ input[type="date"] {
   .fb-chat-widget { right: 14px; bottom: 14px; }
   .fb-chat-toggle { width: 52px; height: 52px; }
 }
+
+#promoBookingForm { scroll-margin-top: 90px; }

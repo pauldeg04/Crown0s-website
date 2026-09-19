@@ -164,35 +164,39 @@ function initPromoCalendar() {
   }
 
   /* Clicking an open stretch of a bed's column fills in the form's
-     Preferred Time (nearest 10 minutes, like CrownOS's own grid). The
-     server still re-checks capacity on submit — this only saves typing. */
+     Preferred Time on the hour (1-hour steps, so it lines up with the
+     hour rows), then scrolls down to the form. If the hour you clicked
+     into is already taken, it moves to the next free hour. The server
+     still re-checks capacity on submit — this only saves typing. */
   function attachPicking(opening, pxPerMin) {
     const timeInput = document.getElementById("promoFormTime");
+    const formEl = document.getElementById("promoBookingForm");
     if (!timeInput) return;
 
     listEl.querySelectorAll(".promo-grid-col-pickable").forEach((col) => {
       col.addEventListener("click", (event) => {
         const rect = col.getBoundingClientRect();
         const raw = opening + Math.floor((event.clientY - rect.top) / pxPerMin);
-        const minute = Math.floor(raw / 10) * 10;
 
         const from = Number(col.dataset.from);
         const to = Number(col.dataset.to);
-        if (minute < from || minute >= to) return;
-
-        const taken = (col.dataset.occupied || "")
+        const ranges = (col.dataset.occupied || "")
           .split(",")
           .filter(Boolean)
-          .some((pair) => {
-            const [start, end] = pair.split("-").map(Number);
-            return minute >= start && minute < end;
-          });
-        if (taken) return;
+          .map((pair) => pair.split("-").map(Number));
 
-        if (dateInput.value === today) {
-          const now = new Date();
-          if (minute <= now.getHours() * 60 + now.getMinutes()) return;
-        }
+        const now = new Date();
+        const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+        const isFree = (minute) =>
+          minute >= from &&
+          minute < to &&
+          !ranges.some(([start, end]) => minute >= start && minute < end) &&
+          !(dateInput.value === today && minute <= nowMinutes);
+
+        let minute = Math.floor(raw / 60) * 60;
+        if (!isFree(minute)) minute += 60;
+        if (!isFree(minute)) return;
 
         timeInput.value = minutesToHHMM(minute);
         timeInput.closest(".field").classList.remove("invalid");
@@ -201,10 +205,13 @@ function initPromoCalendar() {
         const pick = document.createElement("div");
         pick.className = "promo-grid-pick";
         pick.style.top = (minute - opening) * pxPerMin + "px";
+        pick.style.height = 60 * pxPerMin + "px";
         pick.textContent = formatTime(minutesToHHMM(minute));
         col.appendChild(pick);
 
         statusEl.textContent = `Selected ${formatTime(minutesToHHMM(minute))} — added to the form below.`;
+
+        if (formEl) formEl.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     });
   }

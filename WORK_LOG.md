@@ -4,6 +4,15 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-19 (5) — Payday Sale promo: 1-hour click steps + auto-scroll to form
+
+**Requested by:** User — clicking should snap to the exact hour, then jump to the form.
+
+- [js/payday-promo.js](js/payday-promo.js): `attachPicking()` now snaps to the hour (moves to the next free hour if the clicked hour is taken), marker covers the full hour, and it smooth-scrolls to `#promoBookingForm` after a pick.
+- [css/style.css](css/style.css): `scroll-margin-top` on the form so the sticky header doesn't cover it; marker height now set in JS.
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/payday-promo.
+
 ## 2026-09-19 (4) — Payday Sale promo: click the calendar to fill in Preferred Time
 
 **Requested by:** User — clients should click the calendar and have the form's Preferred Time fill in automatically.
