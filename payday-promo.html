@@ -111,6 +111,7 @@
           <div class="field">
             <label for="promoFormTime">Preferred Time</label>
             <input type="time" id="promoFormTime" name="time" required>
+            <input type="hidden" id="promoFormBed" name="bed">
             <span class="error-msg">Please pick a preferred time.</span>
             <span class="field-hint">Tap the calendar above to fill this in, or enter a time yourself.</span>
           </div>
@@ -135,9 +136,9 @@
 
         </div>
 
-        <p class="form-note">By sending this, you agree to be contacted by Crown Head Spa to confirm your appointment. This is a request, not a guaranteed slot, until confirmed by our staff.</p>
+        <p class="form-note">By ordering, you agree to be contacted by Crown Head Spa. Your chosen time is held for 1 hour while our team confirms it and sends your voucher by email; if it isn't confirmed in time, the hold is released.</p>
 
-        <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Send Preferred Schedule</button>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Order Voucher</button>
 
         <div class="confirmation-box" id="promoBookingConfirmation">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
@@ -172,6 +173,7 @@
         <div class="promo-calendar-legend">
           <span><i class="promo-legend-open"></i> Open</span>
           <span><i class="promo-legend-occupied"></i> Occupied</span>
+          <span><i class="promo-legend-held"></i> On hold</span>
           <span><i class="promo-legend-unavailable"></i> Not offered</span>
         </div>
 

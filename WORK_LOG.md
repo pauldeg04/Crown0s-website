@@ -4,6 +4,15 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-19 (15) — Payday Sale promo: "Order Voucher" with a 1-hour hold + countdown
+
+**Requested by:** User — the button becomes **Order Voucher**; the chosen slot is held for 1 hour (countdown from 59:59) and shown to whoever opens the page; unplotted holds expire and free the beds again.
+
+- [payday-promo.html](payday-promo.html) / [js/payday-promo.js](js/payday-promo.js): button renamed; submit now calls the new `submitPaydayVoucherOrder` Cloud Function (`Income Report/functions/index.js`) with the service, time, chosen bed, companion count, email and notes instead of `submitBookingRequest`. The calendar draws each held stretch as an amber "On hold" card with a live mm:ss countdown (new legend entry), counts held time as unavailable for picking, refreshes when a timer ends, and re-polls every 30 s (not while the visitor is mid-pick). After a successful order the same branch/date stays on screen so the client sees their own held slot counting down; a "slot taken" reply reloads the grid.
+- [css/style.css](css/style.css): `.promo-grid-held` / `.promo-hold-timer`.
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/payday-promo.
+
 ## 2026-09-19 (14) — Payday Sale promo: service duration + companion cards preview on the calendar
 
 **Requested by:** User — picking a 90-min service with 2 companions should show the 90-minute card on the grid, plus companion cards created automatically.

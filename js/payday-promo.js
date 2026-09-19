@@ -200,11 +200,24 @@ function initPromoCalendar() {
               .join("")
           : "";
 
-        const openWindow = bed.available && !data.blocked
-          ? `data-bed="${bed.bed}" data-from="${timeToMinutes(bed.from)}" data-to="${timeToMinutes(bed.to)}" data-occupied="${(bed.occupied || []).map((r) => timeToMinutes(r.startTime) + "-" + timeToMinutes(r.endTime)).join(",")}"`
+        const held = bed.available
+          ? (bed.held || [])
+              .map((range) => {
+                const start = Math.max(timeToMinutes(range.startTime), opening);
+                const end = Math.min(timeToMinutes(range.endTime), closing);
+                if (end <= start) return "";
+                return `<div class="promo-grid-held" title="On hold — expires when the timer ends" style="top:${y(start)}px;height:${y(end) - y(start)}px;"><span class="promo-hold-timer" data-expires="${range.expiresAt}">${formatCountdown(range.expiresAt - Date.now())}</span></div>`;
+              })
+              .join("")
           : "";
 
-        return `<div class="promo-grid-col${openWindow ? " promo-grid-col-pickable" : ""}" ${openWindow} style="height:${totalHeight}px;">${off}${occupied}</div>`;
+        const blockedRanges = (bed.occupied || []).concat(bed.held || []);
+
+        const openWindow = bed.available && !data.blocked
+          ? `data-bed="${bed.bed}" data-from="${timeToMinutes(bed.from)}" data-to="${timeToMinutes(bed.to)}" data-bed-number="${bed.bed}" data-occupied="${blockedRanges.map((r) => timeToMinutes(r.startTime) + "-" + timeToMinutes(r.endTime)).join(",")}"`
+          : "";
+
+        return `<div class="promo-grid-col${openWindow ? " promo-grid-col-pickable" : ""}" ${openWindow} style="height:${totalHeight}px;">${off}${occupied}${held}</div>`;
       })
       .join("");
 
@@ -309,6 +322,9 @@ function initPromoCalendar() {
         timeInput.value = minutesToHHMM(minute);
         timeInput.closest(".field").classList.remove("invalid");
 
+        const bedField = document.getElementById("promoFormBed");
+        if (bedField) bedField.value = mainCol.dataset.bedNumber || "";
+
         listEl.querySelectorAll(".promo-grid-pick").forEach((el) => el.remove());
 
         [mainCol].concat(companionCols).forEach((target, index) => {
@@ -331,14 +347,16 @@ function initPromoCalendar() {
 
   let requestToken = 0;
 
-  async function refresh() {
+  async function refresh(silent) {
     const branch = branchSelect.value;
     const date = dateInput.value;
 
     if (!branch || !date) return;
 
-    statusEl.textContent = "Loading availability…";
-    listEl.innerHTML = "";
+    if (silent !== true) {
+      statusEl.textContent = "Loading availability…";
+      listEl.innerHTML = "";
+    }
 
     const token = ++requestToken;
 
@@ -370,6 +388,8 @@ function initPromoCalendar() {
       const timeInput = document.getElementById("promoFormTime");
       if (timeInput && timeInput.value) {
         timeInput.value = "";
+        const bedField = document.getElementById("promoFormBed");
+        if (bedField) bedField.value = "";
         listEl.querySelectorAll(".promo-grid-pick").forEach((node) => node.remove());
         statusEl.textContent = "Your service or group size changed — please tap a time on the calendar again.";
       }
@@ -396,6 +416,35 @@ function initPromoCalendar() {
   }
 
   refresh();
+
+  /* Held slots (someone has ordered a voucher and it isn't plotted yet)
+     count down one hour. Tick the timers every second; when one runs out
+     the slot is free again, so reload the grid. Also re-poll now and then
+     so other people's new holds show up — but never while this visitor is
+     mid-pick, since a reload would wipe their preview. */
+  function formatCountdown(ms) {
+    const secs = Math.max(0, Math.min(3599, Math.floor(ms / 1000)));
+    return String(Math.floor(secs / 60)).padStart(2, "0") + ":" + String(secs % 60).padStart(2, "0");
+  }
+
+  const timeField = document.getElementById("promoFormTime");
+  const isPicking = () => !!(timeField && timeField.value) || !!listEl.querySelector(".promo-grid-pick");
+
+  setInterval(() => {
+    let expired = false;
+
+    listEl.querySelectorAll(".promo-hold-timer").forEach((el) => {
+      const remaining = Number(el.dataset.expires) - Date.now();
+      if (remaining <= 0) expired = true;
+      el.textContent = formatCountdown(remaining);
+    });
+
+    if (expired && !isPicking()) refresh(true);
+  }, 1000);
+
+  setInterval(() => {
+    if (!isPicking() && !document.hidden) refresh(true);
+  }, 30000);
 }
 
 /* ---------- booking-request form ---------- */
@@ -448,13 +497,12 @@ function initPromoBookingForm() {
       serviceName: document.getElementById("promoFormService").value,
       date: dateInput.value,
       startTime: document.getElementById("promoFormTime").value,
+      bed: Number(document.getElementById("promoFormBed").value) || 0,
       clientName: document.getElementById("promoFormName").value.trim(),
       mobile: document.getElementById("promoFormMobile").value.trim(),
       email: document.getElementById("promoFormEmail").value.trim(),
-      notes:
-        "[Payday Sale Promo] Guests: " + (1 + companionCount) +
-        (companionCount > 0 ? ` (1 + ${companionCount} companion${companionCount === 1 ? "" : "s"})` : "") +
-        (notesValue ? ". " + notesValue : "")
+      companions: companionCount,
+      notes: notesValue
     });
 
     if (confirmationText) {
@@ -463,7 +511,12 @@ function initPromoBookingForm() {
 
     if (outcome.ok) {
       form.reset();
-      dateInput.value = dateInput.getAttribute("min");
+      document.getElementById("promoFormBed").value = "";
+    }
+
+    if (outcome.ok || outcome.reason === "no_capacity" || outcome.reason === "date_blocked") {
+      /* Keep the same branch/date so the client sees their held slot (or
+         what's left) with its countdown. */
       branchSelect.dispatchEvent(new Event("change"));
     }
 
@@ -488,31 +541,33 @@ function initPromoBookingForm() {
    CrownOS's existing Booking Requests review flow with no extra wiring. */
 async function submitPaydayPromoRequest(data) {
   const fallbackMessage =
-    "We've saved your request. If you don't hear from us within a few hours, please call or message us directly using the details in the footer.";
+    "We couldn't send your order right now. Please try again in a moment, or call or message us directly using the details in the footer.";
 
   try {
     if (!window.firebase || !firebase.apps || firebase.apps.length === 0) {
       throw new Error("Firebase not initialized");
     }
 
-    const submit = firebase.functions().httpsCallable("submitBookingRequest");
+    const submit = firebase.functions().httpsCallable("submitPaydayVoucherOrder");
     const result = await submit({
       branch: data.branch,
       serviceName: data.serviceName,
       date: data.date,
       startTime: data.startTime,
+      bed: data.bed || 0,
       clientName: data.clientName,
       mobile: data.mobile,
-      email: data.email || "",
-      notes: data.notes || "",
-      companions: []
+      email: data.email,
+      companions: data.companions || 0,
+      notes: data.notes || ""
     });
 
     if (result.data && result.data.ok) {
       return {
         ok: true,
         message:
-          "Thank you! Your Payday Sale request has been received. We'll call you shortly to confirm."
+          "Thank you! Your voucher order was received and your slot is on hold for 1 hour (see the countdown on the calendar below). " +
+          "Our marketing team will confirm it and send your voucher to your email. If it isn't confirmed within the hour, the slot is released to other clients."
       };
     }
 
@@ -520,7 +575,7 @@ async function submitPaydayPromoRequest(data) {
       return {
         ok: false,
         reason: "no_capacity",
-        message: "Sorry, that time was just taken. Please check the calendar above and pick another time."
+        message: "Sorry, that time was just taken or put on hold by another client. Please pick another available time on the calendar and try again."
       };
     }
 
@@ -534,7 +589,7 @@ async function submitPaydayPromoRequest(data) {
 
     return { ok: false, message: fallbackMessage };
   } catch (err) {
-    console.warn("Payday Sale request failed to reach the server:", err);
+    console.warn("Payday Sale voucher order failed to reach the server:", err);
     return { ok: false, message: fallbackMessage };
   }
 }
