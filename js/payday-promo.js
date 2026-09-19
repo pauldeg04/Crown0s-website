@@ -21,9 +21,61 @@
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
+  initPromoServices();
   initPromoCalendar();
   initPromoBookingForm();
 });
+
+/* ---------- treatments ---------- */
+
+/* The dropdown lists only services marked "Available for Payday" in
+   CrownOS List of Services, with their Payday Sale Price — fetched live
+   from the getPaydaySaleServices Cloud Function, so it can't drift from
+   what staff set up. */
+async function initPromoServices() {
+  const select = document.getElementById("promoFormService");
+  if (!select) return;
+
+  const setMessage = (text) => {
+    select.innerHTML = "";
+    select.appendChild(new Option(text, "", true, true));
+    select.options[0].disabled = true;
+    select.disabled = true;
+  };
+
+  try {
+    if (!window.firebase || !firebase.apps || firebase.apps.length === 0) {
+      throw new Error("Firebase not initialized");
+    }
+
+    const getPaydaySaleServices = firebase.functions().httpsCallable("getPaydaySaleServices");
+    const result = await getPaydaySaleServices();
+    const services = (result.data && result.data.services) || [];
+
+    if (services.length === 0) {
+      setMessage("No Payday Sale treatments available right now");
+      return;
+    }
+
+    select.innerHTML = "";
+    const placeholder = new Option("Select a treatment", "", true, true);
+    placeholder.disabled = true;
+    select.appendChild(placeholder);
+
+    services.forEach((service) => {
+      const price = "₱" + Number(service.price).toLocaleString("en-PH");
+      const category = service.category ? ` - ${service.category}` : "";
+      select.appendChild(
+        new Option(`${service.name} (${service.duration} mins)${category} — ${price}`, service.name)
+      );
+    });
+
+    select.disabled = false;
+  } catch (err) {
+    console.warn("Could not load Payday Sale treatments:", err);
+    setMessage("Could not load treatments — please call us instead");
+  }
+}
 
 /* ---------- calendar ---------- */
 

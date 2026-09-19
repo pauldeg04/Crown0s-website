@@ -4,6 +4,15 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-19 (10) — Payday Sale promo: treatments now come from CrownOS
+
+**Requested by:** User — only services marked "Available for Payday" (with their Payday Sale price) should be offered.
+
+- [payday-promo.html](payday-promo.html): the hardcoded treatment list is gone; the dropdown starts as "Loading treatments…".
+- [js/payday-promo.js](js/payday-promo.js): `initPromoServices()` fills it from the new `getPaydaySaleServices` Cloud Function (`Income Report/functions/index.js`) — name, duration, category and ₱ Payday price per option. Shows a message if there are none or the call fails.
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/payday-promo.
+
 ## 2026-09-19 (9) — Payday Sale promo: Preferred Time input no longer overflows its box
 
 **Requested by:** User — the Preferred Time input box extended past the form border on phone.
