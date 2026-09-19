@@ -4,6 +4,15 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-19 (16) — Payday Sale promo: Number of Guests + a service per guest
+
+**Requested by:** User — after Name, ask for Number of Guests; list Guest 1…N beside a services dropdown for each.
+
+- [payday-promo.html](payday-promo.html) / [js/payday-promo.js](js/payday-promo.js): the single Services field and Number of Companions are replaced by **Number of Guests** (1–4, required) and, under it, a "Guest 1 … Guest N" row per guest, each with its own Payday service dropdown (same struck-out original price format). Tapping the calendar needs the guest count and every guest's service first. Each guest's card is drawn at their own service length ("G1"…"G4", different heights), all starting at the chosen time on separate beds — found with a small backtracking search, and the hour is only accepted if every guest fits. Changing guests/services clears the picked time. The order sends `guests: [{serviceName}]` and the previewed `beds` to `submitPaydayVoucherOrder`, which re-checks and holds each bed for its own service length.
+- [css/style.css](css/style.css): `.promo-guest-row` layout (label beside dropdown).
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/payday-promo.
+
 ## 2026-09-19 (15) — Payday Sale promo: "Order Voucher" with a 1-hour hold + countdown
 
 **Requested by:** User — the button becomes **Order Voucher**; the chosen slot is held for 1 hour (countdown from 59:59) and shown to whoever opens the page; unplotted holds expire and free the beds again.

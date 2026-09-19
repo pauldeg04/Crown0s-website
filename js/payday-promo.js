@@ -28,21 +28,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /* ---------- treatments ---------- */
 
-/* The dropdown lists only services marked "Available for Payday" in
-   CrownOS List of Services, with their Payday Sale Price — fetched live
-   from the getPaydaySaleServices Cloud Function, so it can't drift from
-   what staff set up. */
+/* Services offered on the page: only those marked "Available for Payday"
+   in CrownOS List of Services, with their Payday Sale Price — fetched live
+   from the getPaydaySaleServices Cloud Function so it can't drift from
+   what staff set up. Every guest gets their own dropdown of these. */
+let promoServices = [];
+let promoServicesMessage = "Loading services…";
+
 async function initPromoServices() {
-  const select = document.getElementById("promoFormService");
-  if (!select) return;
-
-  const setMessage = (text) => {
-    select.innerHTML = "";
-    select.appendChild(new Option(text, "", true, true));
-    select.options[0].disabled = true;
-    select.disabled = true;
-  };
-
   try {
     if (!window.firebase || !firebase.apps || firebase.apps.length === 0) {
       throw new Error("Firebase not initialized");
@@ -50,40 +43,65 @@ async function initPromoServices() {
 
     const getPaydaySaleServices = firebase.functions().httpsCallable("getPaydaySaleServices");
     const result = await getPaydaySaleServices();
-    const services = (result.data && result.data.services) || [];
-
-    if (services.length === 0) {
-      setMessage("No Payday Sale services available right now");
-      return;
-    }
-
-    select.innerHTML = "";
-    const placeholder = new Option("Select a service", "", true, true);
-    placeholder.disabled = true;
-    select.appendChild(placeholder);
-
-    services.forEach((service) => {
-      const price = "₱" + Number(service.price).toLocaleString("en-PH");
-      const category = service.category ? ` - ${service.category}` : "";
-
-      /* <option> text can't be styled, so the original price is struck out
-         with combining-strikethrough characters (works in every native
-         dropdown, including phone pickers). */
-      const strike = (text) => Array.from(text).map((ch) => ch + "\u0336").join("");
-      const original =
-        Number(service.regularPrice) > Number(service.price)
-          ? strike("₱" + Number(service.regularPrice).toLocaleString("en-PH")) + "  "
-          : "";
-
-      const option = new Option(`${service.name} (${service.duration} mins)${category} — ${original}${price}`, service.name);
-      option.dataset.duration = service.duration;
-      select.appendChild(option);
-    });
-
-    select.disabled = false;
+    promoServices = (result.data && result.data.services) || [];
+    promoServicesMessage = promoServices.length === 0 ? "No Payday Sale services available right now" : "";
   } catch (err) {
-    console.warn("Could not load Payday Sale treatments:", err);
-    setMessage("Could not load services — please call us instead");
+    console.warn("Could not load Payday Sale services:", err);
+    promoServices = [];
+    promoServicesMessage = "Could not load services — please call us instead";
+  }
+
+  renderGuestRows();
+}
+
+function promoServiceOptionsHtml(selected) {
+  if (promoServices.length === 0) {
+    return `<option value="" disabled selected>${promoServicesMessage || "No services available"}</option>`;
+  }
+
+  /* <option> text can't be styled, so the original price is struck out
+     with combining-strikethrough characters (works in every native
+     dropdown, including phone pickers). */
+  const strike = (text) => Array.from(text).map((ch) => ch + "\u0336").join("");
+
+  const options = promoServices.map((service) => {
+    const price = "₱" + Number(service.price).toLocaleString("en-PH");
+    const category = service.category ? ` - ${service.category}` : "";
+    const original =
+      Number(service.regularPrice) > Number(service.price)
+        ? strike("₱" + Number(service.regularPrice).toLocaleString("en-PH")) + "  "
+        : "";
+    const escaped = service.name.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+
+    return `<option value="${escaped}" data-duration="${service.duration}"${service.name === selected ? " selected" : ""}>${service.name.replace(/&/g, "&amp;").replace(/</g, "&lt;")} (${service.duration} mins)${category} — ${original}${price}</option>`;
+  });
+
+  return `<option value=""${selected ? "" : " selected"} disabled>Select a service</option>` + options.join("");
+}
+
+/* One row per guest ("Guest 1" … "Guest N"), each with its own service
+   dropdown. Existing choices are kept when the count changes. */
+function renderGuestRows() {
+  const countSelect = document.getElementById("promoFormGuests");
+  const container = document.getElementById("promoGuestRows");
+  if (!countSelect || !container) return;
+
+  const count = Math.min(4, Math.max(0, Number(countSelect.value) || 0));
+  const previous = Array.from(container.querySelectorAll("select")).map((select) => select.value);
+
+  container.innerHTML = "";
+
+  for (let index = 0; index < count; index++) {
+    const row = document.createElement("div");
+    row.className = "field promo-guest-row";
+    row.innerHTML = `
+      <label for="promoGuestService${index + 1}">Guest ${index + 1}</label>
+      <select id="promoGuestService${index + 1}" class="promo-guest-service" required${promoServices.length === 0 ? " disabled" : ""}>
+        ${promoServiceOptionsHtml(previous[index] || "")}
+      </select>
+      <span class="error-msg">Please choose a service for Guest ${index + 1}.</span>
+    `;
+    container.appendChild(row);
   }
 }
 
@@ -239,20 +257,21 @@ function initPromoCalendar() {
   }
 
   /* Clicking an open stretch of the calendar fills in the form's
-     Preferred Time on the hour (1-hour steps), previews the booking on the
-     grid, and scrolls to the form. The service and number of companions
-     must be chosen first: the chosen service's duration is drawn as a card
-     on one bed, and each companion gets a matching card on another bed at
-     the same time (same service assumed). A time is only accepted when
-     every card fits — enough open beds, each free for the full duration and
-     inside the bed's window. If the hour clicked doesn't work it moves to
-     the next one. The server still re-checks on submit. */
+     Preferred Time on the hour (1-hour steps), previews every guest's card
+     on the grid, and scrolls to the form. Number of guests and every
+     guest's service must be chosen first. Each guest needs their own bed,
+     free for the whole length of THEIR service, all starting at the same
+     time — so the cards can have different heights. A small backtracking
+     search finds a bed for each guest (Guest 1 preferring the bed clicked,
+     the rest nearby); if the hour clicked doesn't work it tries the next
+     one. The server still re-checks on submit. */
   function attachPicking(opening, pxPerMin) {
     const timeInput = document.getElementById("promoFormTime");
     const formEl = document.getElementById("promoBookingForm");
-    const companionsSelect = document.getElementById("promoFormCompanions");
-    const serviceSelect = document.getElementById("promoFormService");
-    if (!timeInput || !companionsSelect || !serviceSelect) return;
+    const guestsSelect = document.getElementById("promoFormGuests");
+    const guestRows = document.getElementById("promoGuestRows");
+    const bedsField = document.getElementById("promoFormBeds");
+    if (!timeInput || !guestsSelect || !guestRows) return;
 
     const cols = Array.from(listEl.querySelectorAll(".promo-grid-col-pickable"));
 
@@ -282,63 +301,79 @@ function initPromoCalendar() {
 
     cols.forEach((col) => {
       col.addEventListener("click", (event) => {
-        if (serviceSelect.value === "") {
-          prompt(serviceSelect, "Please choose your service first, then tap a time.");
+        if (guestsSelect.value === "") {
+          prompt(guestsSelect, "Please choose your number of guests first, then tap a time.");
           return;
         }
 
-        if (companionsSelect.value === "") {
-          prompt(companionsSelect, "Please choose your number of companions first, then tap a time.");
+        const serviceSelects = Array.from(guestRows.querySelectorAll("select"));
+        const missing = serviceSelects.find((select) => select.value === "");
+        if (missing) {
+          prompt(missing, "Please choose a service for every guest first, then tap a time.");
           return;
         }
 
-        const duration = Number(serviceSelect.selectedOptions[0].dataset.duration) || 60;
-        const guests = 1 + Number(companionsSelect.value);
+        const durations = serviceSelects.map((select) => Number(select.selectedOptions[0].dataset.duration) || 60);
+        const guests = durations.length;
+
         const rect = col.getBoundingClientRect();
         const raw = opening + Math.floor((event.clientY - rect.top) / pxPerMin);
+        const clickIndex = cols.indexOf(col);
 
-        const openBedsAt = (minute) => cols.filter((c) => bedIsFree(c, minute, duration));
+        const bedOrder = cols
+          .slice()
+          .sort((a, b) => Math.abs(cols.indexOf(a) - clickIndex) - Math.abs(cols.indexOf(b) - clickIndex) || cols.indexOf(a) - cols.indexOf(b));
+
+        const assign = (minute) => {
+          const picked = [];
+
+          const place = (index) => {
+            if (index === guests) return true;
+
+            for (const candidate of bedOrder) {
+              if (picked.includes(candidate) || !bedIsFree(candidate, minute, durations[index])) continue;
+              picked.push(candidate);
+              if (place(index + 1)) return true;
+              picked.pop();
+            }
+
+            return false;
+          };
+
+          return place(0) ? picked.slice() : null;
+        };
 
         let minute = Math.floor(raw / 60) * 60;
-        if (openBedsAt(minute).length < guests || !bedIsFree(col, minute, duration)) minute += 60;
+        let assigned = assign(minute);
 
-        const open = openBedsAt(minute);
-
-        if (open.length < guests) {
-          statusEl.textContent =
-            `${duration} mins from ${formatTime(minutesToHHMM(minute))} fits on ${open.length} bed${open.length === 1 ? "" : "s"}, but you need ${guests} for ${guests} guest${guests === 1 ? "" : "s"}. Please pick another time.`;
-          return;
+        if (!assigned) {
+          minute += 60;
+          assigned = assign(minute);
         }
 
-        /* Guest 1 on the clicked bed when it's free, companions on the
-           nearest remaining open beds. */
-        const mainCol = open.includes(col) ? col : open[0];
-        const mainIndex = cols.indexOf(mainCol);
-        const companionCols = open
-          .filter((c) => c !== mainCol)
-          .sort((x, y) => Math.abs(cols.indexOf(x) - mainIndex) - Math.abs(cols.indexOf(y) - mainIndex))
-          .slice(0, guests - 1);
+        if (!assigned) {
+          statusEl.textContent =
+            `There aren't enough open beds at that time for ${guests} guest${guests === 1 ? "" : "s"} — each guest needs a bed free for their whole service. Please pick another time.`;
+          return;
+        }
 
         timeInput.value = minutesToHHMM(minute);
         timeInput.closest(".field").classList.remove("invalid");
-
-        const bedField = document.getElementById("promoFormBed");
-        if (bedField) bedField.value = mainCol.dataset.bedNumber || "";
+        if (bedsField) bedsField.value = assigned.map((c) => c.dataset.bedNumber).join(",");
 
         listEl.querySelectorAll(".promo-grid-pick").forEach((el) => el.remove());
 
-        [mainCol].concat(companionCols).forEach((target, index) => {
+        assigned.forEach((target, index) => {
           const pick = document.createElement("div");
           pick.className = "promo-grid-pick" + (index > 0 ? " promo-grid-pick-companion" : "");
           pick.style.top = (minute - opening) * pxPerMin + "px";
-          pick.style.height = duration * pxPerMin + "px";
-          pick.innerHTML = `<span>${index === 0 ? "You" : "C" + index}</span>`;
+          pick.style.height = durations[index] * pxPerMin + "px";
+          pick.innerHTML = `<span>G${index + 1}</span>`;
           target.appendChild(pick);
         });
 
         statusEl.textContent =
-          `Selected ${formatTime(minutesToHHMM(minute))} – ${formatTime(minutesToHHMM(minute + duration))} ` +
-          `for ${guests} guest${guests === 1 ? "" : "s"} (${duration} mins) — added to the form below.`;
+          `Selected ${formatTime(minutesToHHMM(minute))} for ${guests} guest${guests === 1 ? "" : "s"} — added to the form below.`;
 
         if (formEl) formEl.scrollIntoView({ behavior: "smooth", block: "start" });
       });
@@ -378,23 +413,37 @@ function initPromoCalendar() {
     }
   }
 
-  /* A different service or group size may not fit the time already picked. */
-  ["promoFormCompanions", "promoFormService"].forEach((id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
+  /* A different group size or service may not fit the time already
+     picked, so clear it. */
+  const guestsSelectEl = document.getElementById("promoFormGuests");
+  const guestRowsEl = document.getElementById("promoGuestRows");
 
-    el.addEventListener("change", () => {
-      el.closest(".field").classList.remove("invalid");
-      const timeInput = document.getElementById("promoFormTime");
-      if (timeInput && timeInput.value) {
-        timeInput.value = "";
-        const bedField = document.getElementById("promoFormBed");
-        if (bedField) bedField.value = "";
-        listEl.querySelectorAll(".promo-grid-pick").forEach((node) => node.remove());
-        statusEl.textContent = "Your service or group size changed — please tap a time on the calendar again.";
-      }
+  const clearPicked = () => {
+    const timeInput = document.getElementById("promoFormTime");
+    if (timeInput && timeInput.value) {
+      timeInput.value = "";
+      const bedsField = document.getElementById("promoFormBeds");
+      if (bedsField) bedsField.value = "";
+      listEl.querySelectorAll(".promo-grid-pick").forEach((node) => node.remove());
+      statusEl.textContent = "Your guests or services changed — please tap a time on the calendar again.";
+    }
+  };
+
+  if (guestsSelectEl) {
+    guestsSelectEl.addEventListener("change", () => {
+      guestsSelectEl.closest(".field").classList.remove("invalid");
+      renderGuestRows();
+      clearPicked();
     });
-  });
+  }
+
+  if (guestRowsEl) {
+    guestRowsEl.addEventListener("change", (event) => {
+      const row = event.target.closest(".field");
+      if (row) row.classList.remove("invalid");
+      clearPicked();
+    });
+  }
 
   branchSelect.addEventListener("change", refresh);
   dateInput.addEventListener("change", refresh);
@@ -490,18 +539,15 @@ function initPromoBookingForm() {
     }
 
     const notesValue = document.getElementById("promoFormNotes").value.trim();
-    const companionCount = Math.min(3, Math.max(0, Number(document.getElementById("promoFormCompanions").value) || 0));
-
     const outcome = await submitPaydayPromoRequest({
       branch: branchSelect.value,
-      serviceName: document.getElementById("promoFormService").value,
       date: dateInput.value,
       startTime: document.getElementById("promoFormTime").value,
-      bed: Number(document.getElementById("promoFormBed").value) || 0,
+      beds: document.getElementById("promoFormBeds").value.split(",").filter(Boolean).map(Number),
+      guests: Array.from(document.querySelectorAll("#promoGuestRows select")).map((select) => ({ serviceName: select.value })),
       clientName: document.getElementById("promoFormName").value.trim(),
       mobile: document.getElementById("promoFormMobile").value.trim(),
       email: document.getElementById("promoFormEmail").value.trim(),
-      companions: companionCount,
       notes: notesValue
     });
 
@@ -511,7 +557,8 @@ function initPromoBookingForm() {
 
     if (outcome.ok) {
       form.reset();
-      document.getElementById("promoFormBed").value = "";
+      document.getElementById("promoFormBeds").value = "";
+      renderGuestRows();
     }
 
     if (outcome.ok || outcome.reason === "no_capacity" || outcome.reason === "date_blocked") {
@@ -551,14 +598,13 @@ async function submitPaydayPromoRequest(data) {
     const submit = firebase.functions().httpsCallable("submitPaydayVoucherOrder");
     const result = await submit({
       branch: data.branch,
-      serviceName: data.serviceName,
       date: data.date,
       startTime: data.startTime,
-      bed: data.bed || 0,
+      beds: data.beds || [],
+      guests: data.guests || [],
       clientName: data.clientName,
       mobile: data.mobile,
       email: data.email,
-      companions: data.companions || 0,
       notes: data.notes || ""
     });
 

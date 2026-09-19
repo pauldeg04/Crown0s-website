@@ -75,7 +75,7 @@
 
       <div class="booking-hint" style="margin-bottom:16px;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>
-        <span>Choose your service and companions, then tap an open spot on the calendar below — your booking (and your companions' beds) will show on it and fill in your preferred time automatically. We'll confirm your schedule with you.</span>
+        <span>Choose your number of guests and each guest's service, then tap an open spot on the calendar below — every guest's bed will show on it and your preferred time fills in automatically. We'll confirm your schedule with you.</span>
       </div>
 
       <form id="promoBookingForm" class="form-card" novalidate >
@@ -88,30 +88,24 @@
           </div>
 
           <div class="field">
-            <label for="promoFormService">Services</label>
-            <select id="promoFormService" name="service" required disabled>
-              <option value="" disabled selected>Loading services…</option>
+            <label for="promoFormGuests">Number of Guests</label>
+            <select id="promoFormGuests" name="guests" required>
+              <option value="" disabled selected>Select number of guests</option>
+              <option value="1">1 guest (just me)</option>
+              <option value="2">2 guests</option>
+              <option value="3">3 guests</option>
+              <option value="4">4 guests</option>
             </select>
-            <span class="error-msg">Please select a service.</span>
+            <span class="error-msg">Please choose how many guests are coming.</span>
+            <span class="field-hint">Up to 4 guests in total. Guest 1 is you.</span>
           </div>
 
-          <div class="field">
-            <label for="promoFormCompanions">Number of Companions</label>
-            <select id="promoFormCompanions" name="companions" required>
-              <option value="" disabled selected>Select number of companions</option>
-              <option value="0">None — just me</option>
-              <option value="1">1 companion (2 guests)</option>
-              <option value="2">2 companions (3 guests)</option>
-              <option value="3">3 companions (4 guests)</option>
-            </select>
-            <span class="error-msg">Please choose how many companions are coming.</span>
-            <span class="field-hint">Up to 3 companions (4 guests in total). Choose your service and this first, then tap a time on the calendar below.</span>
-          </div>
+          <div class="promo-guest-rows" id="promoGuestRows" style="grid-column:1 / -1;"></div>
 
           <div class="field">
             <label for="promoFormTime">Preferred Time</label>
             <input type="time" id="promoFormTime" name="time" required>
-            <input type="hidden" id="promoFormBed" name="bed">
+            <input type="hidden" id="promoFormBeds" name="beds">
             <span class="error-msg">Please pick a preferred time.</span>
             <span class="field-hint">Tap the calendar above to fill this in, or enter a time yourself.</span>
           </div>
