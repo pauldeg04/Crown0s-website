@@ -4,6 +4,15 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-19 (8) — Payday Sale promo: calendar fits the screen width
+
+**Requested by:** User — 50% was too small; instead make the grid fit a phone's width with no sideways scrolling.
+
+- [css/style.css](css/style.css): bed columns are now `minmax(0, 1fr)` so the grid always fills the card width (no horizontal scroll); tighter time column/padding under 560px.
+- [js/payday-promo.js](js/payday-promo.js): hour height set to 54px (`PX_PER_MIN` 0.9), between the original 72px and the too-small 36px.
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/payday-promo.
+
 ## 2026-09-19 (7) — Payday Sale promo: calendar cells shrunk to 50%
 
 **Requested by:** User — make each calendar box 50% smaller, horizontally and vertically.

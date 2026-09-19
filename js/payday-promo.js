@@ -92,7 +92,7 @@ function initPromoCalendar() {
 
     listEl.classList.toggle("promo-bed-list-blocked", !!data.blocked);
 
-    const PX_PER_MIN = 0.6;
+    const PX_PER_MIN = 0.9;
     const opening = timeToMinutes(data.openingTime);
     const closing = Math.max(opening + 60, timeToMinutes(data.closingTime));
     const totalHeight = (closing - opening) * PX_PER_MIN;

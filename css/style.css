@@ -1085,11 +1085,11 @@ input[type="date"] {
 
 /* CrownOS-style timeline grid: bed columns, hours down the side. */
 .promo-grid-scroll { overflow-x: auto; border: 1px solid rgba(20, 17, 10, 0.12); border-radius: var(--radius-sm); }
-.promo-grid { width: max-content; min-width: 100%; }
+.promo-grid { width: 100%; }
 .promo-grid-head,
 .promo-grid-body {
   display: grid;
-  grid-template-columns: 62px repeat(var(--bed-count, 1), 34px);
+  grid-template-columns: 54px repeat(var(--bed-count, 1), minmax(0, 1fr));
 }
 .promo-grid-head-cell {
   display: flex;
@@ -1137,6 +1137,13 @@ input[type="date"] {
 }
 .promo-grid-col-pickable { cursor: pointer; }
 .promo-grid-col-pickable:hover { background-color: #fbf6e3; }
+@media (max-width: 560px) {
+  .promo-calendar-card { padding: 18px 10px; }
+  .promo-grid-head,
+  .promo-grid-body { grid-template-columns: 44px repeat(var(--bed-count, 1), minmax(0, 1fr)); }
+  .promo-grid-hour { font-size: 0.6rem; padding: 2px 3px; }
+  .promo-grid-head-cell { font-size: 0.6rem; }
+}
 .promo-grid-pick {
   font-size: 0.56rem !important;
   line-height: 1.05;
