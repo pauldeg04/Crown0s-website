@@ -68,22 +68,25 @@ function initPromoCalendar() {
   }
 
   function renderBeds(data) {
-    if (data.blocked) {
-      statusEl.textContent =
-        "This date isn't available for the Payday Sale" +
-        (data.blockReason ? ` (${data.blockReason})` : "") +
-        " — please choose another date.";
-      listEl.innerHTML = "";
-      return;
-    }
-
     if (!data.beds || data.beds.length === 0) {
-      statusEl.textContent = "No beds are set up for this branch yet.";
+      statusEl.textContent = data.blocked
+        ? "This date isn't available for the Payday Sale" +
+          (data.blockReason ? ` (${data.blockReason})` : "") +
+          " — please choose another date."
+        : "No beds are set up for this branch yet.";
       listEl.innerHTML = "";
       return;
     }
 
-    statusEl.textContent = "";
+    /* A blocked date still shows the bed calendar so guests can see the
+       day's schedule — just dimmed, with the reason above it. */
+    statusEl.textContent = data.blocked
+      ? "This date isn't available for the Payday Sale" +
+        (data.blockReason ? ` (${data.blockReason})` : "") +
+        " — please choose another date. Here's the schedule for reference."
+      : "";
+
+    listEl.classList.toggle("promo-bed-list-blocked", !!data.blocked);
 
     listEl.innerHTML = data.beds
       .map((bed) => {

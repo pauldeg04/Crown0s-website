@@ -4,6 +4,15 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-19 (2) — Payday Sale promo: bed calendar now shows on blocked dates too
+
+**Requested by:** User — wanted guests to be able to view the calendar even when a date is blocked (before, a blocked date showed only a message and no calendar).
+
+- [js/payday-promo.js](js/payday-promo.js): a blocked date now still renders the per-bed bars, with the "not available" message and reason above them ("Here's the schedule for reference"). Only an empty bed list falls back to message-only.
+- [css/style.css](css/style.css): new `.promo-bed-list-blocked` dims/greys the bars on blocked dates.
+
+**Deployed:** `firebase deploy --only hosting` → live at https://crownheadspa.com/payday-promo.
+
 ## 2026-09-19 — New unlisted page: Payday Sale promo calendar
 
 **Requested by:** User — wanted a special page for the Payday Sale campaign, reachable only by

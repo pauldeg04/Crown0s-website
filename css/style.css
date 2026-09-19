@@ -1081,6 +1081,8 @@ input[type="date"] {
   gap: 14px;
 }
 
+.promo-bed-list-blocked { opacity: 0.55; filter: grayscale(0.6); }
+
 .promo-bed-row {
   display: flex;
   flex-direction: column;
