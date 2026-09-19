@@ -96,6 +96,19 @@
           </div>
 
           <div class="field">
+            <label for="promoFormCompanions">Number of Companions</label>
+            <select id="promoFormCompanions" name="companions" required>
+              <option value="" disabled selected>Select number of companions</option>
+              <option value="0">None — just me</option>
+              <option value="1">1 companion (2 guests)</option>
+              <option value="2">2 companions (3 guests)</option>
+              <option value="3">3 companions (4 guests)</option>
+            </select>
+            <span class="error-msg">Please choose how many companions are coming.</span>
+            <span class="field-hint">Up to 3 companions (4 guests in total). Choose this first, then tap a time on the calendar below.</span>
+          </div>
+
+          <div class="field">
             <label for="promoFormTime">Preferred Time</label>
             <input type="time" id="promoFormTime" name="time" required>
             <span class="error-msg">Please pick a preferred time.</span>
@@ -109,8 +122,10 @@
           </div>
 
           <div class="field">
-            <label for="promoFormEmail">Email Address <span style="font-weight:400;color:var(--ink-soft);">(optional)</span></label>
-            <input type="email" id="promoFormEmail" name="email" placeholder="you@email.com">
+            <label for="promoFormEmail">Email Address <span style="font-weight:400;color:var(--ink-soft);">(Required)</span></label>
+            <input type="email" id="promoFormEmail" name="email" placeholder="you@email.com" required>
+            <span class="error-msg">Please enter a valid email address.</span>
+            <span class="field-hint">Your Payday Sale voucher will be sent to this email.</span>
           </div>
 
           <div class="field full">

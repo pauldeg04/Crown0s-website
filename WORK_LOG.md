@@ -4,6 +4,15 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-19 (13) — Payday Sale promo: required email + number of companions (max 3)
+
+**Requested by:** User — email is now required (the voucher is sent there), and a companion count (number only, max 3 = 4 guests, all branches) must be chosen before a time can be picked on the calendar.
+
+- [payday-promo.html](payday-promo.html): Email is required (with error + "voucher will be sent here" hint); new required **Number of Companions** select (None / 1 / 2 / 3).
+- [js/payday-promo.js](js/payday-promo.js): tapping the calendar without a companion count shows a prompt and scrolls to that field. With one chosen, a time is only picked if that hour has at least as many open beds as guests (1 + companions), otherwise a message says how many are open; changing the count clears an already-picked time. On submit the notes read `[Payday Sale Promo] Guests: N (1 + K companions)…`, so staff see the group size in CrownOS (companion names aren't collected — `submitBookingRequest` isn't changed).
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/payday-promo.
+
 ## 2026-09-19 (12) — Payday Sale promo: original price struck out beside the Payday price
 
 **Requested by:** User — in the Services list, show the original price struck out next to the Payday Sale price.

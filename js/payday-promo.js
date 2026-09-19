@@ -225,53 +225,77 @@ function initPromoCalendar() {
     attachPicking(opening, PX_PER_MIN);
   }
 
-  /* Clicking an open stretch of a bed's column fills in the form's
-     Preferred Time on the hour (1-hour steps, so it lines up with the
-     hour rows), then scrolls down to the form. If the hour you clicked
-     into is already taken, it moves to the next free hour. The server
-     still re-checks capacity on submit — this only saves typing. */
+  /* Clicking an open stretch of the calendar fills in the form's
+     Preferred Time on the hour (1-hour steps) and scrolls to the form.
+     The number of companions must be chosen first, and the hour needs at
+     least one open bed per guest (the guest plus their companions), so a
+     group is never sent a time the branch can't seat them at once. If the
+     hour clicked doesn't work it moves to the next one. The server still
+     re-checks on submit. */
   function attachPicking(opening, pxPerMin) {
     const timeInput = document.getElementById("promoFormTime");
     const formEl = document.getElementById("promoBookingForm");
-    if (!timeInput) return;
+    const companionsSelect = document.getElementById("promoFormCompanions");
+    if (!timeInput || !companionsSelect) return;
 
-    listEl.querySelectorAll(".promo-grid-col-pickable").forEach((col) => {
+    const cols = Array.from(listEl.querySelectorAll(".promo-grid-col-pickable"));
+
+    const now = new Date();
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+    const bedIsFree = (col, minute) => {
+      const from = Number(col.dataset.from);
+      const to = Number(col.dataset.to);
+      const taken = (col.dataset.occupied || "")
+        .split(",")
+        .filter(Boolean)
+        .some((pair) => {
+          const [start, end] = pair.split("-").map(Number);
+          return minute >= start && minute < end;
+        });
+
+      return minute >= from && minute < to && !taken && !(dateInput.value === today && minute <= nowMinutes);
+    };
+
+    cols.forEach((col) => {
       col.addEventListener("click", (event) => {
+        if (companionsSelect.value === "") {
+          companionsSelect.closest(".field").classList.add("invalid");
+          statusEl.textContent = "Please choose your number of companions first, then tap a time.";
+          companionsSelect.scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
+
+        const guests = 1 + Number(companionsSelect.value);
         const rect = col.getBoundingClientRect();
         const raw = opening + Math.floor((event.clientY - rect.top) / pxPerMin);
 
-        const from = Number(col.dataset.from);
-        const to = Number(col.dataset.to);
-        const ranges = (col.dataset.occupied || "")
-          .split(",")
-          .filter(Boolean)
-          .map((pair) => pair.split("-").map(Number));
-
-        const now = new Date();
-        const nowMinutes = now.getHours() * 60 + now.getMinutes();
-
-        const isFree = (minute) =>
-          minute >= from &&
-          minute < to &&
-          !ranges.some(([start, end]) => minute >= start && minute < end) &&
-          !(dateInput.value === today && minute <= nowMinutes);
+        const openBedsAt = (minute) => cols.filter((c) => bedIsFree(c, minute));
 
         let minute = Math.floor(raw / 60) * 60;
-        if (!isFree(minute)) minute += 60;
-        if (!isFree(minute)) return;
+        if (openBedsAt(minute).length < guests || !bedIsFree(col, minute)) minute += 60;
+
+        const open = openBedsAt(minute);
+
+        if (open.length < guests) {
+          statusEl.textContent =
+            `That time has ${open.length} open bed${open.length === 1 ? "" : "s"} but you need ${guests} for ${guests} guest${guests === 1 ? "" : "s"}. Please pick another time.`;
+          return;
+        }
 
         timeInput.value = minutesToHHMM(minute);
         timeInput.closest(".field").classList.remove("invalid");
 
         listEl.querySelectorAll(".promo-grid-pick").forEach((el) => el.remove());
+        const target = bedIsFree(col, minute) ? col : open[0];
         const pick = document.createElement("div");
         pick.className = "promo-grid-pick";
         pick.style.top = (minute - opening) * pxPerMin + "px";
         pick.style.height = 60 * pxPerMin + "px";
         pick.textContent = formatTime(minutesToHHMM(minute));
-        col.appendChild(pick);
+        target.appendChild(pick);
 
-        statusEl.textContent = `Selected ${formatTime(minutesToHHMM(minute))} — added to the form below.`;
+        statusEl.textContent = `Selected ${formatTime(minutesToHHMM(minute))} for ${guests} guest${guests === 1 ? "" : "s"} — added to the form below.`;
 
         if (formEl) formEl.scrollIntoView({ behavior: "smooth", block: "start" });
       });
@@ -307,6 +331,20 @@ function initPromoCalendar() {
       console.warn("Could not load Payday Sale availability:", err);
       statusEl.textContent = "Could not load availability right now — please try again in a moment.";
     }
+  }
+
+  /* A different group size may not fit the time already picked. */
+  const companionsSelectEl = document.getElementById("promoFormCompanions");
+  if (companionsSelectEl) {
+    companionsSelectEl.addEventListener("change", () => {
+      companionsSelectEl.closest(".field").classList.remove("invalid");
+      const timeInput = document.getElementById("promoFormTime");
+      if (timeInput && timeInput.value) {
+        timeInput.value = "";
+        listEl.querySelectorAll(".promo-grid-pick").forEach((el) => el.remove());
+        statusEl.textContent = "Group size changed — please tap a time on the calendar again.";
+      }
+    });
   }
 
   branchSelect.addEventListener("change", refresh);
@@ -374,6 +412,7 @@ function initPromoBookingForm() {
     }
 
     const notesValue = document.getElementById("promoFormNotes").value.trim();
+    const companionCount = Math.min(3, Math.max(0, Number(document.getElementById("promoFormCompanions").value) || 0));
 
     const outcome = await submitPaydayPromoRequest({
       branch: branchSelect.value,
@@ -383,7 +422,10 @@ function initPromoBookingForm() {
       clientName: document.getElementById("promoFormName").value.trim(),
       mobile: document.getElementById("promoFormMobile").value.trim(),
       email: document.getElementById("promoFormEmail").value.trim(),
-      notes: "[Payday Sale Promo] " + notesValue
+      notes:
+        "[Payday Sale Promo] Guests: " + (1 + companionCount) +
+        (companionCount > 0 ? ` (1 + ${companionCount} companion${companionCount === 1 ? "" : "s"})` : "") +
+        (notesValue ? ". " + notesValue : "")
     });
 
     if (confirmationText) {
