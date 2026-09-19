@@ -4,6 +4,14 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-19 (6) — Payday Sale promo: form moved above the calendar
+
+**Requested by:** User — swap the positions so the booking form is on top.
+
+- [payday-promo.html](payday-promo.html): order is now hint → booking form → Branch/Date + calendar; hint copy says "the calendar below". Clicking the calendar still fills Preferred Time and scrolls (now up) to the form.
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/payday-promo.
+
 ## 2026-09-19 (5) — Payday Sale promo: 1-hour click steps + auto-scroll to form
 
 **Requested by:** User — clicking should snap to the exact hour, then jump to the form.

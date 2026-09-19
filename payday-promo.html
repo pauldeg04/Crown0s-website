@@ -73,45 +73,12 @@
   <section class="section">
     <div class="container" style="max-width:760px;">
 
-      <div class="promo-calendar-card">
-
-        <div class="promo-calendar-controls">
-          <div class="field">
-            <label for="promoBranch">Branch</label>
-            <select id="promoBranch">
-              <option value="Biñan">Crown Head Spa — Biñan</option>
-              <option value="Calamba">Crown Head Spa — Calamba</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label for="promoDate">Date</label>
-            <div class="promo-date-stepper">
-              <button type="button" class="promo-date-step-btn" id="promoPrevDay" aria-label="Previous day">‹</button>
-              <input type="date" id="promoDate">
-              <button type="button" class="promo-date-step-btn" id="promoNextDay" aria-label="Next day">›</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="promo-calendar-legend">
-          <span><i class="promo-legend-open"></i> Open</span>
-          <span><i class="promo-legend-occupied"></i> Occupied</span>
-          <span><i class="promo-legend-unavailable"></i> Not offered</span>
-        </div>
-
-        <p class="promo-calendar-status" id="promoCalendarStatus">Loading availability…</p>
-
-        <div class="promo-bed-list" id="promoBedList"></div>
-
-      </div>
-
-      <div class="booking-hint" style="margin-top:24px;">
+      <div class="booking-hint" style="margin-bottom:16px;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>
-        <span>Tap an open spot on the calendar to fill in your preferred time automatically, then complete the form below. We'll confirm your schedule with you.</span>
+        <span>Tap an open spot on the calendar below to fill in your preferred time automatically, then complete the form below. We'll confirm your schedule with you.</span>
       </div>
 
-      <form id="promoBookingForm" class="form-card" novalidate style="margin-top:16px;">
+      <form id="promoBookingForm" class="form-card" novalidate >
         <div class="form-grid">
 
           <div class="field full">
@@ -181,6 +148,40 @@
           </div>
         </div>
       </form>
+
+      <div class="promo-calendar-card" id="promoCalendarCard" style="margin-top:24px;">
+
+        <div class="promo-calendar-controls">
+          <div class="field">
+            <label for="promoBranch">Branch</label>
+            <select id="promoBranch">
+              <option value="Biñan">Crown Head Spa — Biñan</option>
+              <option value="Calamba">Crown Head Spa — Calamba</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="promoDate">Date</label>
+            <div class="promo-date-stepper">
+              <button type="button" class="promo-date-step-btn" id="promoPrevDay" aria-label="Previous day">‹</button>
+              <input type="date" id="promoDate">
+              <button type="button" class="promo-date-step-btn" id="promoNextDay" aria-label="Next day">›</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="promo-calendar-legend">
+          <span><i class="promo-legend-open"></i> Open</span>
+          <span><i class="promo-legend-occupied"></i> Occupied</span>
+          <span><i class="promo-legend-unavailable"></i> Not offered</span>
+        </div>
+
+        <p class="promo-calendar-status" id="promoCalendarStatus">Loading availability…</p>
+
+        <div class="promo-bed-list" id="promoBedList"></div>
+
+      </div>
+
 
     </div>
   </section>
