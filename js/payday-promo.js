@@ -65,8 +65,18 @@ async function initPromoServices() {
     services.forEach((service) => {
       const price = "₱" + Number(service.price).toLocaleString("en-PH");
       const category = service.category ? ` - ${service.category}` : "";
+
+      /* <option> text can't be styled, so the original price is struck out
+         with combining-strikethrough characters (works in every native
+         dropdown, including phone pickers). */
+      const strike = (text) => Array.from(text).map((ch) => ch + "\u0336").join("");
+      const original =
+        Number(service.regularPrice) > Number(service.price)
+          ? strike("₱" + Number(service.regularPrice).toLocaleString("en-PH")) + "  "
+          : "";
+
       select.appendChild(
-        new Option(`${service.name} (${service.duration} mins)${category} — ${price}`, service.name)
+        new Option(`${service.name} (${service.duration} mins)${category} — ${original}${price}`, service.name)
       );
     });
 

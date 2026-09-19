@@ -4,6 +4,15 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-19 (12) — Payday Sale promo: original price struck out beside the Payday price
+
+**Requested by:** User — in the Services list, show the original price struck out next to the Payday Sale price.
+
+- [js/payday-promo.js](js/payday-promo.js): each option now reads `Service (mins) - Category — ~~₱Regular~~  ₱Payday`. `<option>` text can't be styled, so the strikethrough uses combining strikethrough characters (U+0336), which render in every native dropdown including phone pickers. Only shown when the Regular price is higher than the Payday price.
+- `getPaydaySaleServices` (`Income Report/functions/index.js`) now also returns `regularPrice` (nothing else new).
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/payday-promo, and `functions:getPaydaySaleServices`.
+
 ## 2026-09-19 (11) — Payday Sale promo: "Preferred Treatment" renamed to "Services"
 
 **Requested by:** User — rename the field; only services ticked Available for Payday in CrownOS are listed (already the case since the previous entry).
