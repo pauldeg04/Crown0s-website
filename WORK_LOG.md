@@ -4,6 +4,16 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-20 (2) — Fix: pressing Enter placed the voucher order
+
+**Reported by:** User — after typing a new Preferred Time and pressing Enter, the order was sent (thank-you box shown, 1-hour hold started) before the contact details were filled in.
+
+**Cause:** Enter in any form field triggers the browser's implicit submit; the earlier guard only covered the date field and dropdowns. The contact fields were probably filled by browser autofill, so validation passed.
+
+**Fix:** [js/payday-promo.js](js/payday-promo.js) now blocks Enter (and the phone keyboard's Go) in every field except the notes box; the order is sent only by pressing **Order Voucher**.
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/payday-promo.
+
 ## 2026-09-20 — Payday Sale promo: form reordered around the calendar
 
 **Requested by:** User — order should be Name, Number of Guests, a service per guest, then the calendar, then the rest of the info.

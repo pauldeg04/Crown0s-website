@@ -583,9 +583,12 @@ function initPromoBookingForm() {
     }
   });
 
-  /* Pressing Enter in the calendar's date field must not submit the order. */
+  /* Enter (or "Go" on a phone keyboard) in any field must never place the
+     order — it used to submit the form the moment someone pressed Enter
+     after typing a time. The order is only sent by pressing the Order
+     Voucher button. */
   form.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" && event.target.matches("input[type='date'], select")) {
+    if (event.key === "Enter" && event.target.tagName !== "TEXTAREA" && event.target.tagName !== "BUTTON") {
       event.preventDefault();
     }
   });
