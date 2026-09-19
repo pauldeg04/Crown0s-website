@@ -1010,6 +1010,116 @@ input[type="date"] {
 .confirmation-box p { margin: 0; color: var(--sage-dark); }
 
 /* ==========================================================================
+   Payday Sale promo calendar (payday-promo.html, js/payday-promo.js)
+   View-only — no click handlers, just Branch/Date pickers and one
+   availability bar per bed. Mirrors the Open/Occupied/Not-offered
+   language CrownOS's own Payday Sale admin grid uses, in a much simpler
+   single-row-per-bed shape suited to a public page.
+   ========================================================================== */
+
+.promo-calendar-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(20, 17, 10, 0.06);
+}
+@media (max-width: 640px) { .promo-calendar-card { padding: 22px 18px; } }
+
+.promo-calendar-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+@media (max-width: 560px) { .promo-calendar-controls { grid-template-columns: 1fr; } }
+
+.promo-date-stepper {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+.promo-date-stepper input[type="date"] { flex: 1; min-width: 0; }
+
+.promo-date-step-btn {
+  flex: 0 0 auto;
+  width: 42px;
+  border: 1px solid rgba(20, 17, 10, 0.16);
+  border-radius: var(--radius-sm);
+  background: var(--cream);
+  color: var(--ink);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.promo-date-step-btn:hover { background: var(--sage-light); }
+
+.promo-calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  margin-bottom: 16px;
+}
+.promo-calendar-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.promo-calendar-legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.promo-legend-open { background: var(--sage-light); border: 1px solid var(--sage); }
+.promo-legend-occupied { background: #b7b0a0; }
+.promo-legend-unavailable { background: rgba(20, 17, 10, 0.12); }
+
+.promo-calendar-status {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  margin: 0 0 12px;
+}
+
+.promo-bed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.promo-bed-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.promo-bed-label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.promo-bed-status {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+.promo-bed-status-off { color: #c94b55; }
+
+.promo-bed-bar {
+  position: relative;
+  height: 20px;
+  border-radius: 6px;
+  background: var(--sage-light);
+  border: 1px solid var(--sage);
+  overflow: hidden;
+}
+
+.promo-bed-occupied {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: #b7b0a0;
+}
+
+/* ==========================================================================
    FAQ / accordion
    ========================================================================== */
 

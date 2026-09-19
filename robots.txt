@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /payday-promo
 
 Sitemap: https://crownheadspa.com/sitemap.xml

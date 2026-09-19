@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payday Sale | Crown Head Spa</title>
+<meta name="description" content="Crown Head Spa Payday Sale — check bed availability and send us your preferred schedule.">
+<!-- Unlisted: no nav link points here, and this keeps it out of search
+     results too. Reachable only by whoever has this exact link — see
+     robots.txt's matching Disallow entry. -->
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="images/favicon-32.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-functions-compat.js"></script>
+<script src="js/firebase-init.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="container">
+    <div class="topbar-contact">
+      <a href="tel:+639395884068">📞 0939 588 4068 (Biñan)</a>
+      <a href="tel:+639614402807">📞 0961 440 2807 (Calamba)</a>
+    </div>
+    <div class="header-social">
+      <a class="social-icon" href="https://web.facebook.com/crown.headspa" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.91h-2.33V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg></a>
+    </div>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="nav-wrap">
+    <a href="/" class="brand">
+      <img src="images/crown-mark.png" alt="Crown Head Spa crest">
+      <span class="brand-text">Crown Head Spa</span>
+    </a>
+    <nav>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="about">About</a></li>
+        <li><a href="services">Services</a></li>
+        <li><a href="branches">Branches</a></li>
+        <li><a href="gallery">Gallery</a></li>
+        <li><a href="promos">Promos</a></li>
+        <li><a href="testimonials">Testimonials</a></li>
+        <li><a href="contact">Contact / FAQ</a></li>
+        <li><a href="careers">Careers</a></li>
+      </ul>
+    </nav>
+    <div class="nav-actions">
+      <a href="book" class="btn btn-primary"><span>Book Now</span></a>
+      <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="page-hero">
+    <div class="container">
+      <p class="eyebrow">Payday Sale</p>
+      <h1>Check availability &amp; send your schedule</h1>
+      <p>Browse open beds for your preferred branch and date below, then send us your preferred schedule. This is a request — we'll call or text you to confirm.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container" style="max-width:760px;">
+
+      <div class="promo-calendar-card">
+
+        <div class="promo-calendar-controls">
+          <div class="field">
+            <label for="promoBranch">Branch</label>
+            <select id="promoBranch">
+              <option value="Biñan">Crown Head Spa — Biñan</option>
+              <option value="Calamba">Crown Head Spa — Calamba</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="promoDate">Date</label>
+            <div class="promo-date-stepper">
+              <button type="button" class="promo-date-step-btn" id="promoPrevDay" aria-label="Previous day">‹</button>
+              <input type="date" id="promoDate">
+              <button type="button" class="promo-date-step-btn" id="promoNextDay" aria-label="Next day">›</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="promo-calendar-legend">
+          <span><i class="promo-legend-open"></i> Open</span>
+          <span><i class="promo-legend-occupied"></i> Occupied</span>
+          <span><i class="promo-legend-unavailable"></i> Not offered</span>
+        </div>
+
+        <p class="promo-calendar-status" id="promoCalendarStatus">Loading availability…</p>
+
+        <div class="promo-bed-list" id="promoBedList"></div>
+
+      </div>
+
+      <div class="booking-hint" style="margin-top:24px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>
+        <span>This calendar is for reference only — it isn't clickable. Use the form below to tell us your preferred date and time, and we'll confirm against it.</span>
+      </div>
+
+      <form id="promoBookingForm" class="form-card" novalidate style="margin-top:16px;">
+        <div class="form-grid">
+
+          <div class="field full">
+            <label for="promoFormName">Name</label>
+            <input type="text" id="promoFormName" name="name" required>
+            <span class="error-msg">Please enter your name.</span>
+          </div>
+
+          <div class="field">
+            <label for="promoFormService">Preferred Treatment</label>
+            <select id="promoFormService" name="service" required>
+              <option value="" disabled selected>Select a treatment</option>
+              <option value="Crown Detox and Glow">Crown Detox and Glow (90 mins) - Head Spa</option>
+              <option value="Crown Reset">Crown Reset (25 mins) - Head Spa</option>
+              <option value="Crown Serenity">Crown Serenity (45 mins) - Head Spa</option>
+              <option value="Crown Signature Massage (60mins)">Crown Signature Massage (60 mins) - Massage</option>
+              <option value="Crown Signature Massage (90mins)">Crown Signature Massage (90 mins) - Massage</option>
+              <option value="Detox Flow Massage (60mins)">Detox Flow Massage (60 mins) - Massage</option>
+              <option value="Detox Flow Massage (90mins)">Detox Flow Massage (90 mins) - Massage</option>
+              <option value="The Detox and Glow Experience">The Detox and Glow Experience (150 mins) - Combo</option>
+              <option value="The Reset Duo">The Reset Duo (85 mins) - Combo</option>
+              <option value="The Serenity Set">The Serenity Set (105 mins) - Combo</option>
+              <option value="The Sole calm Treat">The Sole Calm Treat (55 mins) - Combo</option>
+              <option value="Thermal Calm Massage (60mins)">Thermal Calm Massage (60 mins) - Massage</option>
+              <option value="Thermal Calm Massage (90mins)">Thermal Calm Massage (90 mins) - Massage</option>
+              <option value="Warm Glow Massage (60mins)">Warm Glow Massage (60 mins) - Massage</option>
+              <option value="Warm Glow Massage (90mins)">Warm Glow Massage (90 mins) - Massage</option>
+              <option value="Not sure yet">Not sure yet — recommend for me</option>
+            </select>
+            <span class="error-msg">Please select a treatment.</span>
+          </div>
+
+          <div class="field">
+            <label for="promoFormTime">Preferred Time</label>
+            <input type="time" id="promoFormTime" name="time" required>
+            <span class="error-msg">Please pick a preferred time.</span>
+            <span class="field-hint">Check the calendar above for an open bed at this time.</span>
+          </div>
+
+          <div class="field">
+            <label for="promoFormMobile">Contact Number <span style="font-weight:400;color:var(--ink-soft);">(Required)</span></label>
+            <input type="tel" id="promoFormMobile" name="mobile" placeholder="09XX XXX XXXX" pattern="[0-9+\s\-]{7,15}" required>
+            <span class="error-msg">Please enter a valid mobile number.</span>
+          </div>
+
+          <div class="field">
+            <label for="promoFormEmail">Email Address <span style="font-weight:400;color:var(--ink-soft);">(optional)</span></label>
+            <input type="email" id="promoFormEmail" name="email" placeholder="you@email.com">
+          </div>
+
+          <div class="field full">
+            <label for="promoFormNotes">Notes <span style="font-weight:400;color:var(--ink-soft);">(optional)</span></label>
+            <textarea id="promoFormNotes" name="notes" placeholder="Any scalp concerns, allergies, or requests we should know about?"></textarea>
+          </div>
+
+        </div>
+
+        <p class="form-note">By sending this, you agree to be contacted by Crown Head Spa to confirm your appointment. This is a request, not a guaranteed slot, until confirmed by our staff.</p>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Send Preferred Schedule</button>
+
+        <div class="confirmation-box" id="promoBookingConfirmation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+          <div>
+            <h4>Thank you! Your request has been received.</h4>
+            <p>Please keep your phone handy — our staff will call or text the mobile number you provided to confirm your Payday Sale schedule.</p>
+          </div>
+        </div>
+      </form>
+
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="footer-brand">
+          <img src="images/crown-mark.png" alt="Crown Head Spa crest">
+          <span>Crown Head Spa</span>
+        </div>
+        <p>Premium head spa rituals for deep relaxation and scalp wellness.</p>
+        <div class="social-row">
+          <a class="social-icon" href="https://web.facebook.com/crown.headspa" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.91h-2.33V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="about">About Us</a></li>
+          <li><a href="services">Services</a></li>
+          <li><a href="promos">Promos</a></li>
+          <li><a href="gallery">Gallery</a></li>
+          <li><a href="testimonials">Testimonials</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Visit</h4>
+        <ul>
+          <li><a href="branches">Our Branches</a></li>
+          <li><a href="book">Book an Appointment</a></li>
+          <li><a href="contact">Contact &amp; FAQ</a></li>
+          <li><a href="careers">Careers</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Get in Touch</h4>
+        <p>Biñan: 0939 588 4068<br>Calamba: 0961 440 2807</p>
+        <p>Biñan open daily 1PM–10PM<br>Calamba open daily 1PM–10PM</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Crown Head Spa. All rights reserved.</span>
+      <span class="footer-legal"><a href="privacy">Privacy Policy</a></span>
+    </div>
+  </div>
+</footer>
+
+<div class="fb-chat-widget">
+  <div class="fb-chat-menu">
+    <p>Biñan Branch</p>
+    <a href="https://m.me/584649091394403" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.4"/></svg>
+      Messenger
+    </a>
+    <a href="https://wa.me/639395884068" target="_blank" rel="noopener">
+      <svg style="color:#25D366;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      WhatsApp
+    </a>
+    <a href="viber://chat?number=%2B639395884068" target="_blank" rel="noopener">
+      <svg style="color:#7360F2;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      Viber
+    </a>
+    <p>Calamba Branch</p>
+    <a href="https://m.me/924236430782142" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12Z"/><circle cx="12" cy="9" r="2.4"/></svg>
+      Messenger
+    </a>
+    <a href="https://wa.me/639614402807" target="_blank" rel="noopener">
+      <svg style="color:#25D366;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      WhatsApp
+    </a>
+    <a href="viber://chat?number=%2B639614402807" target="_blank" rel="noopener">
+      <svg style="color:#7360F2;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      Viber
+    </a>
+  </div>
+  <button class="fb-chat-toggle" type="button" aria-label="Chat with us">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.15 2 11.26c0 2.91 1.45 5.51 3.73 7.21V22l3.41-1.87c.91.25 1.87.39 2.86.39 5.52 0 10-4.15 10-9.26S17.52 2 12 2Zm1.02 12.47-2.55-2.72-4.98 2.72 5.48-5.82 2.61 2.72 4.92-2.72-5.48 5.82Z"/></svg>
+  </button>
+</div>
+<script src="js/main.js"></script>
+<script src="js/payday-promo.js"></script>
+</body>
+</html>

@@ -4,6 +4,45 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-19 — New unlisted page: Payday Sale promo calendar
+
+**Requested by:** User — wanted a special page for the Payday Sale campaign, reachable only by
+whoever is given the direct link (not linked from the site's own nav/footer, and kept out of
+search results). Shows a potential client which beds are open, calendar-type, view-only — then
+lets them send a simplified booking request, with occupied beds reflecting real bookings.
+
+- New page [payday-promo.html](payday-promo.html) — same site header/footer/chat-widget as every
+  other page (so it doesn't feel broken if someone lands on it), but no nav link anywhere points
+  to it, `<meta name="robots" content="noindex, nofollow">` in its `<head>`, a matching
+  `Disallow: /payday-promo` added to [robots.txt](robots.txt), and it's left out of
+  [sitemap.xml](sitemap.xml).
+- Body has two parts: (1) a Branch selector + Date picker (prev/next day arrows, defaults to
+  today) above one availability bar per bed — green for open, grey for occupied, calling the new
+  `getPaydaySaleAvailability` Cloud Function (see `Income Report/functions/index.js`) on every
+  branch/date change. Purely a view — no click-to-select, matching the request that this only be
+  a schedule *view*, not an editable calendar. (2) A simplified booking-request form below it
+  (Name, Preferred Treatment, Preferred Time, Mobile, Email, Notes — no guest rows/companions,
+  unlike `book.html`'s full form) that calls the same `submitBookingRequest` Cloud Function
+  `book.html` itself uses, so a request lands in CrownOS's normal Booking Requests review exactly
+  like any other public-website request — just with a `[Payday Sale Promo]` tag prepended to its
+  notes so staff can tell it apart at a glance.
+- New [js/payday-promo.js](js/payday-promo.js) — self-contained, doesn't touch or depend on
+  `book.html`'s own form logic in [js/main.js](js/main.js) (different element ids, so
+  `main.js`'s `initBookingForm()` simply no-ops on this page); `main.js` is still loaded
+  alongside it for the shared header/footer/cookie-consent/chat-widget behavior every page gets.
+- New CSS block in [css/style.css](css/style.css) (`.promo-calendar-card` and friends) for the
+  Branch/Date controls, the legend, and each bed's availability bar.
+
+**What wasn't touched:** `book.html`'s own booking form, `getAvailableSlots`, and
+`submitBookingRequest` — the promo page reads a brand-new Cloud Function for its calendar and
+calls the *existing* `submitBookingRequest` unmodified for its form.
+
+**Deployed:** `firebase deploy --only hosting` → live at https://crownheadspa.com/payday-promo
+(no nav link, but reachable directly). The backing Cloud Function was deployed separately from
+`Income Report` via `firebase deploy --only functions:getPaydaySaleAvailability`.
+
+---
+
 ## 2026-09-18 — Updated branch hours to 1PM–10PM for both branches
 
 **Requested by:** User — Biñan and Calamba branches are now both open
