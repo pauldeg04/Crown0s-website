@@ -4,6 +4,14 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-19 (9) — Payday Sale promo: Preferred Time input no longer overflows its box
+
+**Requested by:** User — the Preferred Time input box extended past the form border on phone.
+
+- [css/style.css](css/style.css): `input[type="time"]` now gets the same treatment as `input[type="date"]` (`appearance: none`, `min-width: 0`, `max-width: 100%`) — iOS Safari ignores `box-sizing` on native time inputs, same bug already fixed for the date field.
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/payday-promo.
+
 ## 2026-09-19 (8) — Payday Sale promo: calendar fits the screen width
 
 **Requested by:** User — 50% was too small; instead make the grid fit a phone's width with no sideways scrolling.

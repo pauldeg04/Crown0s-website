@@ -878,10 +878,14 @@ p { margin: 0 0 1em; color: var(--ink-soft); }
    ::-webkit-datetime-edit layout, so it can render wider than its
    container even with width: 100% set — removing the native appearance
    makes it respect the box model like a normal text input. */
-input[type="date"] {
+input[type="date"],
+input[type="time"] {
   -webkit-appearance: none;
   appearance: none;
+  min-width: 0;
+  max-width: 100%;
 }
+input[type="time"]::-webkit-date-and-time-value { text-align: left; }
 
 .field .error-msg {
   font-size: 0.78rem;
