@@ -1148,7 +1148,10 @@ input[type="time"]::-webkit-date-and-time-value { text-align: left; }
   .promo-grid-hour { font-size: 0.6rem; padding: 2px 3px; }
   .promo-grid-head-cell { font-size: 0.6rem; }
 }
+.promo-grid-pick-companion { background: var(--wood-light) !important; }
 .promo-grid-pick {
+  align-items: flex-start !important;
+  padding-top: 3px !important;
   font-size: 0.56rem !important;
   line-height: 1.05;
   text-align: center;

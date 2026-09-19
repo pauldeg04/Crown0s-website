@@ -4,6 +4,16 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-19 (14) — Payday Sale promo: service duration + companion cards preview on the calendar
+
+**Requested by:** User — picking a 90-min service with 2 companions should show the 90-minute card on the grid, plus companion cards created automatically.
+
+- [js/payday-promo.js](js/payday-promo.js): the service and companion count must be chosen before tapping a time. A tap now previews a card the full length of the service on one bed ("You") and one matching card per companion ("C1", "C2", "C3") on the nearest other open beds at the same time. A time is only accepted if every card fits — each bed free for the whole duration and inside its window — otherwise a message explains, and it tries the next hour first. Changing the service or companions clears the picked time. Service options now carry their duration (`data-duration`).
+- [css/style.css](css/style.css): companion cards use a different colour from the main card.
+- [payday-promo.html](payday-promo.html): hint copy updated.
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/payday-promo.
+
 ## 2026-09-19 (13) — Payday Sale promo: required email + number of companions (max 3)
 
 **Requested by:** User — email is now required (the voucher is sent there), and a companion count (number only, max 3 = 4 guests, all branches) must be chosen before a time can be picked on the calendar.

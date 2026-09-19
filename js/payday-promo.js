@@ -75,9 +75,9 @@ async function initPromoServices() {
           ? strike("₱" + Number(service.regularPrice).toLocaleString("en-PH")) + "  "
           : "";
 
-      select.appendChild(
-        new Option(`${service.name} (${service.duration} mins)${category} — ${original}${price}`, service.name)
-      );
+      const option = new Option(`${service.name} (${service.duration} mins)${category} — ${original}${price}`, service.name);
+      option.dataset.duration = service.duration;
+      select.appendChild(option);
     });
 
     select.disabled = false;
@@ -226,76 +226,103 @@ function initPromoCalendar() {
   }
 
   /* Clicking an open stretch of the calendar fills in the form's
-     Preferred Time on the hour (1-hour steps) and scrolls to the form.
-     The number of companions must be chosen first, and the hour needs at
-     least one open bed per guest (the guest plus their companions), so a
-     group is never sent a time the branch can't seat them at once. If the
-     hour clicked doesn't work it moves to the next one. The server still
-     re-checks on submit. */
+     Preferred Time on the hour (1-hour steps), previews the booking on the
+     grid, and scrolls to the form. The service and number of companions
+     must be chosen first: the chosen service's duration is drawn as a card
+     on one bed, and each companion gets a matching card on another bed at
+     the same time (same service assumed). A time is only accepted when
+     every card fits — enough open beds, each free for the full duration and
+     inside the bed's window. If the hour clicked doesn't work it moves to
+     the next one. The server still re-checks on submit. */
   function attachPicking(opening, pxPerMin) {
     const timeInput = document.getElementById("promoFormTime");
     const formEl = document.getElementById("promoBookingForm");
     const companionsSelect = document.getElementById("promoFormCompanions");
-    if (!timeInput || !companionsSelect) return;
+    const serviceSelect = document.getElementById("promoFormService");
+    if (!timeInput || !companionsSelect || !serviceSelect) return;
 
     const cols = Array.from(listEl.querySelectorAll(".promo-grid-col-pickable"));
 
     const now = new Date();
     const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
-    const bedIsFree = (col, minute) => {
+    const bedIsFree = (col, minute, duration) => {
       const from = Number(col.dataset.from);
       const to = Number(col.dataset.to);
+      const end = minute + duration;
       const taken = (col.dataset.occupied || "")
         .split(",")
         .filter(Boolean)
         .some((pair) => {
-          const [start, end] = pair.split("-").map(Number);
-          return minute >= start && minute < end;
+          const [start, stop] = pair.split("-").map(Number);
+          return minute < stop && end > start;
         });
 
-      return minute >= from && minute < to && !taken && !(dateInput.value === today && minute <= nowMinutes);
+      return minute >= from && end <= to && !taken && !(dateInput.value === today && minute <= nowMinutes);
+    };
+
+    const prompt = (field, text) => {
+      field.closest(".field").classList.add("invalid");
+      statusEl.textContent = text;
+      field.scrollIntoView({ behavior: "smooth", block: "center" });
     };
 
     cols.forEach((col) => {
       col.addEventListener("click", (event) => {
-        if (companionsSelect.value === "") {
-          companionsSelect.closest(".field").classList.add("invalid");
-          statusEl.textContent = "Please choose your number of companions first, then tap a time.";
-          companionsSelect.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (serviceSelect.value === "") {
+          prompt(serviceSelect, "Please choose your service first, then tap a time.");
           return;
         }
 
+        if (companionsSelect.value === "") {
+          prompt(companionsSelect, "Please choose your number of companions first, then tap a time.");
+          return;
+        }
+
+        const duration = Number(serviceSelect.selectedOptions[0].dataset.duration) || 60;
         const guests = 1 + Number(companionsSelect.value);
         const rect = col.getBoundingClientRect();
         const raw = opening + Math.floor((event.clientY - rect.top) / pxPerMin);
 
-        const openBedsAt = (minute) => cols.filter((c) => bedIsFree(c, minute));
+        const openBedsAt = (minute) => cols.filter((c) => bedIsFree(c, minute, duration));
 
         let minute = Math.floor(raw / 60) * 60;
-        if (openBedsAt(minute).length < guests || !bedIsFree(col, minute)) minute += 60;
+        if (openBedsAt(minute).length < guests || !bedIsFree(col, minute, duration)) minute += 60;
 
         const open = openBedsAt(minute);
 
         if (open.length < guests) {
           statusEl.textContent =
-            `That time has ${open.length} open bed${open.length === 1 ? "" : "s"} but you need ${guests} for ${guests} guest${guests === 1 ? "" : "s"}. Please pick another time.`;
+            `${duration} mins from ${formatTime(minutesToHHMM(minute))} fits on ${open.length} bed${open.length === 1 ? "" : "s"}, but you need ${guests} for ${guests} guest${guests === 1 ? "" : "s"}. Please pick another time.`;
           return;
         }
+
+        /* Guest 1 on the clicked bed when it's free, companions on the
+           nearest remaining open beds. */
+        const mainCol = open.includes(col) ? col : open[0];
+        const mainIndex = cols.indexOf(mainCol);
+        const companionCols = open
+          .filter((c) => c !== mainCol)
+          .sort((x, y) => Math.abs(cols.indexOf(x) - mainIndex) - Math.abs(cols.indexOf(y) - mainIndex))
+          .slice(0, guests - 1);
 
         timeInput.value = minutesToHHMM(minute);
         timeInput.closest(".field").classList.remove("invalid");
 
         listEl.querySelectorAll(".promo-grid-pick").forEach((el) => el.remove());
-        const target = bedIsFree(col, minute) ? col : open[0];
-        const pick = document.createElement("div");
-        pick.className = "promo-grid-pick";
-        pick.style.top = (minute - opening) * pxPerMin + "px";
-        pick.style.height = 60 * pxPerMin + "px";
-        pick.textContent = formatTime(minutesToHHMM(minute));
-        target.appendChild(pick);
 
-        statusEl.textContent = `Selected ${formatTime(minutesToHHMM(minute))} for ${guests} guest${guests === 1 ? "" : "s"} — added to the form below.`;
+        [mainCol].concat(companionCols).forEach((target, index) => {
+          const pick = document.createElement("div");
+          pick.className = "promo-grid-pick" + (index > 0 ? " promo-grid-pick-companion" : "");
+          pick.style.top = (minute - opening) * pxPerMin + "px";
+          pick.style.height = duration * pxPerMin + "px";
+          pick.innerHTML = `<span>${index === 0 ? "You" : "C" + index}</span>`;
+          target.appendChild(pick);
+        });
+
+        statusEl.textContent =
+          `Selected ${formatTime(minutesToHHMM(minute))} – ${formatTime(minutesToHHMM(minute + duration))} ` +
+          `for ${guests} guest${guests === 1 ? "" : "s"} (${duration} mins) — added to the form below.`;
 
         if (formEl) formEl.scrollIntoView({ behavior: "smooth", block: "start" });
       });
@@ -333,19 +360,21 @@ function initPromoCalendar() {
     }
   }
 
-  /* A different group size may not fit the time already picked. */
-  const companionsSelectEl = document.getElementById("promoFormCompanions");
-  if (companionsSelectEl) {
-    companionsSelectEl.addEventListener("change", () => {
-      companionsSelectEl.closest(".field").classList.remove("invalid");
+  /* A different service or group size may not fit the time already picked. */
+  ["promoFormCompanions", "promoFormService"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.addEventListener("change", () => {
+      el.closest(".field").classList.remove("invalid");
       const timeInput = document.getElementById("promoFormTime");
       if (timeInput && timeInput.value) {
         timeInput.value = "";
-        listEl.querySelectorAll(".promo-grid-pick").forEach((el) => el.remove());
-        statusEl.textContent = "Group size changed — please tap a time on the calendar again.";
+        listEl.querySelectorAll(".promo-grid-pick").forEach((node) => node.remove());
+        statusEl.textContent = "Your service or group size changed — please tap a time on the calendar again.";
       }
     });
-  }
+  });
 
   branchSelect.addEventListener("change", refresh);
   dateInput.addEventListener("change", refresh);
