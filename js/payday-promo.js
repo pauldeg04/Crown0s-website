@@ -53,12 +53,12 @@ async function initPromoServices() {
     const services = (result.data && result.data.services) || [];
 
     if (services.length === 0) {
-      setMessage("No Payday Sale treatments available right now");
+      setMessage("No Payday Sale services available right now");
       return;
     }
 
     select.innerHTML = "";
-    const placeholder = new Option("Select a treatment", "", true, true);
+    const placeholder = new Option("Select a service", "", true, true);
     placeholder.disabled = true;
     select.appendChild(placeholder);
 
@@ -73,7 +73,7 @@ async function initPromoServices() {
     select.disabled = false;
   } catch (err) {
     console.warn("Could not load Payday Sale treatments:", err);
-    setMessage("Could not load treatments — please call us instead");
+    setMessage("Could not load services — please call us instead");
   }
 }
 

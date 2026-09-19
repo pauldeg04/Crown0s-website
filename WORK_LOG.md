@@ -4,6 +4,14 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-19 (11) — Payday Sale promo: "Preferred Treatment" renamed to "Services"
+
+**Requested by:** User — rename the field; only services ticked Available for Payday in CrownOS are listed (already the case since the previous entry).
+
+- [payday-promo.html](payday-promo.html) / [js/payday-promo.js](js/payday-promo.js): label, placeholder, error and status messages now say "Services" / "service" instead of "Preferred Treatment" / "treatment".
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/payday-promo.
+
 ## 2026-09-19 (10) — Payday Sale promo: treatments now come from CrownOS
 
 **Requested by:** User — only services marked "Available for Payday" (with their Payday Sale price) should be offered.
