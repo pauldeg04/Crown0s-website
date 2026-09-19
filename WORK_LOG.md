@@ -4,6 +4,16 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-09-20 — Payday Sale promo: form reordered around the calendar
+
+**Requested by:** User — order should be Name, Number of Guests, a service per guest, then the calendar, then the rest of the info.
+
+- [payday-promo.html](payday-promo.html): the single form now has two cards with the calendar between them — **Name / Number of Guests / Guest 1…N services**, then the **calendar** (Branch, Date, grid), then **Preferred Time, Contact Number, Email, Notes** and the Order Voucher button.
+- [js/payday-promo.js](js/payday-promo.js): picking a time scrolls down to the details card; because Branch/Date are now inside the form, a successful order keeps them (so the client still sees their held slot) instead of letting `reset()` clear them; Enter in the date/branch fields no longer submits the order.
+- [css/style.css](css/style.css): `scroll-margin-top` for the details card.
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/payday-promo.
+
 ## 2026-09-19 (16) — Payday Sale promo: Number of Guests + a service per guest
 
 **Requested by:** User — after Name, ask for Number of Guests; list Guest 1…N beside a services dropdown for each.

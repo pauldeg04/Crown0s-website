@@ -267,7 +267,7 @@ function initPromoCalendar() {
      one. The server still re-checks on submit. */
   function attachPicking(opening, pxPerMin) {
     const timeInput = document.getElementById("promoFormTime");
-    const formEl = document.getElementById("promoBookingForm");
+    const formEl = document.getElementById("promoDetailsCard");
     const guestsSelect = document.getElementById("promoFormGuests");
     const guestRows = document.getElementById("promoGuestRows");
     const bedsField = document.getElementById("promoFormBeds");
@@ -556,7 +556,14 @@ function initPromoBookingForm() {
     }
 
     if (outcome.ok) {
+      /* Branch and Date sit inside the form now (between the guest
+         services and the contact details), so reset() would wipe them —
+         keep them so the client still sees their held slot. */
+      const keptBranch = branchSelect.value;
+      const keptDate = dateInput.value;
       form.reset();
+      branchSelect.value = keptBranch;
+      dateInput.value = keptDate;
       document.getElementById("promoFormBeds").value = "";
       renderGuestRows();
     }
@@ -573,6 +580,13 @@ function initPromoBookingForm() {
     if (submitBtn) {
       submitBtn.disabled = false;
       submitBtn.textContent = submitBtn.dataset.originalText;
+    }
+  });
+
+  /* Pressing Enter in the calendar's date field must not submit the order. */
+  form.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && event.target.matches("input[type='date'], select")) {
+      event.preventDefault();
     }
   });
 

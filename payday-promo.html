@@ -75,11 +75,13 @@
 
       <div class="booking-hint" style="margin-bottom:16px;">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>
-        <span>Choose your number of guests and each guest's service, then tap an open spot on the calendar below — every guest's bed will show on it and your preferred time fills in automatically. We'll confirm your schedule with you.</span>
+        <span>Enter your name, your number of guests and each guest's service, then tap an open spot on the calendar — every guest's bed will show on it and your preferred time fills in automatically. We'll confirm your schedule with you.</span>
       </div>
 
-      <form id="promoBookingForm" class="form-card" novalidate >
-        <div class="form-grid">
+      <form id="promoBookingForm" novalidate>
+
+        <div class="form-card">
+          <div class="form-grid">
 
           <div class="field full">
             <label for="promoFormName">Name</label>
@@ -102,46 +104,8 @@
 
           <div class="promo-guest-rows" id="promoGuestRows" style="grid-column:1 / -1;"></div>
 
-          <div class="field">
-            <label for="promoFormTime">Preferred Time</label>
-            <input type="time" id="promoFormTime" name="time" required>
-            <input type="hidden" id="promoFormBeds" name="beds">
-            <span class="error-msg">Please pick a preferred time.</span>
-            <span class="field-hint">Tap the calendar above to fill this in, or enter a time yourself.</span>
-          </div>
-
-          <div class="field">
-            <label for="promoFormMobile">Contact Number <span style="font-weight:400;color:var(--ink-soft);">(Required)</span></label>
-            <input type="tel" id="promoFormMobile" name="mobile" placeholder="09XX XXX XXXX" pattern="[0-9+\s\-]{7,15}" required>
-            <span class="error-msg">Please enter a valid mobile number.</span>
-          </div>
-
-          <div class="field">
-            <label for="promoFormEmail">Email Address <span style="font-weight:400;color:var(--ink-soft);">(Required)</span></label>
-            <input type="email" id="promoFormEmail" name="email" placeholder="you@email.com" required>
-            <span class="error-msg">Please enter a valid email address.</span>
-            <span class="field-hint">Your Payday Sale voucher will be sent to this email.</span>
-          </div>
-
-          <div class="field full">
-            <label for="promoFormNotes">Notes <span style="font-weight:400;color:var(--ink-soft);">(optional)</span></label>
-            <textarea id="promoFormNotes" name="notes" placeholder="Any scalp concerns, allergies, or requests we should know about?"></textarea>
-          </div>
-
-        </div>
-
-        <p class="form-note">By ordering, you agree to be contacted by Crown Head Spa. Your chosen time is held for 1 hour while our team confirms it and sends your voucher by email; if it isn't confirmed in time, the hold is released.</p>
-
-        <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Order Voucher</button>
-
-        <div class="confirmation-box" id="promoBookingConfirmation">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
-          <div>
-            <h4>Thank you! Your request has been received.</h4>
-            <p>Please keep your phone handy — our staff will call or text the mobile number you provided to confirm your Payday Sale schedule.</p>
           </div>
         </div>
-      </form>
 
       <div class="promo-calendar-card" id="promoCalendarCard" style="margin-top:24px;">
 
@@ -177,6 +141,51 @@
 
       </div>
 
+        <div class="form-card" id="promoDetailsCard" style="margin-top:24px;">
+          <div class="form-grid">
+
+          <div class="field">
+            <label for="promoFormTime">Preferred Time</label>
+            <input type="time" id="promoFormTime" name="time" required>
+            <input type="hidden" id="promoFormBeds" name="beds">
+            <span class="error-msg">Please pick a preferred time.</span>
+            <span class="field-hint">Tap the calendar above to fill this in, or enter a time yourself.</span>
+          </div>
+
+          <div class="field">
+            <label for="promoFormMobile">Contact Number <span style="font-weight:400;color:var(--ink-soft);">(Required)</span></label>
+            <input type="tel" id="promoFormMobile" name="mobile" placeholder="09XX XXX XXXX" pattern="[0-9+\s\-]{7,15}" required>
+            <span class="error-msg">Please enter a valid mobile number.</span>
+          </div>
+
+          <div class="field">
+            <label for="promoFormEmail">Email Address <span style="font-weight:400;color:var(--ink-soft);">(Required)</span></label>
+            <input type="email" id="promoFormEmail" name="email" placeholder="you@email.com" required>
+            <span class="error-msg">Please enter a valid email address.</span>
+            <span class="field-hint">Your Payday Sale voucher will be sent to this email.</span>
+          </div>
+
+          <div class="field full">
+            <label for="promoFormNotes">Notes <span style="font-weight:400;color:var(--ink-soft);">(optional)</span></label>
+            <textarea id="promoFormNotes" name="notes" placeholder="Any scalp concerns, allergies, or requests we should know about?"></textarea>
+          </div>
+
+          </div>
+
+        <p class="form-note">By ordering, you agree to be contacted by Crown Head Spa. Your chosen time is held for 1 hour while our team confirms it and sends your voucher by email; if it isn't confirmed in time, the hold is released.</p>
+
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top:8px;">Order Voucher</button>
+
+        <div class="confirmation-box" id="promoBookingConfirmation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+          <div>
+            <h4>Thank you! Your request has been received.</h4>
+            <p>Please keep your phone handy — our staff will call or text the mobile number you provided to confirm your Payday Sale schedule.</p>
+          </div>
+        </div>
+        </div>
+
+      </form>
 
     </div>
   </section>

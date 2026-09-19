@@ -1767,7 +1767,8 @@ input[type="time"]::-webkit-date-and-time-value { text-align: left; }
   .fb-chat-toggle { width: 52px; height: 52px; }
 }
 
-#promoBookingForm { scroll-margin-top: 90px; }
+#promoBookingForm,
+#promoDetailsCard { scroll-margin-top: 90px; }
 
 .promo-grid-held {
   position: absolute;
