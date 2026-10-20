@@ -12,6 +12,9 @@
       "*.md"
     ],
     "cleanUrls": true,
+    "redirects": [
+      { "source": "/payday-promo", "destination": "/promotions", "type": 301 }
+    ],
     "headers": [
       {
         "source": "**/*.@(js|css)",

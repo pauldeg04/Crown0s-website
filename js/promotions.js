@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Crown Head Spa — Payday Sale promo page (unlisted, payday-promo.html)
+   Crown Head Spa — Promotions page (unlisted, promotions.html)
 
    Two pieces, both independent of book.html's own booking form (main.js's
    initBookingForm targets #bookingForm specifically, so it no-ops here):
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
 /* ---------- treatments ---------- */
 
 /* Services offered on the page: only those marked "Available for Payday"
-   in CrownOS List of Services, with their Payday Sale Price — fetched live
+   in CrownOS List of Services, with their Promo Price — fetched live
    from the getPaydaySaleServices Cloud Function so it can't drift from
    what staff set up. Every guest gets their own dropdown of these. */
 let promoServices = [];
@@ -44,9 +44,9 @@ async function initPromoServices() {
     const getPaydaySaleServices = firebase.functions().httpsCallable("getPaydaySaleServices");
     const result = await getPaydaySaleServices();
     promoServices = (result.data && result.data.services) || [];
-    promoServicesMessage = promoServices.length === 0 ? "No Payday Sale services available right now" : "";
+    promoServicesMessage = promoServices.length === 0 ? "No promo services available right now" : "";
   } catch (err) {
-    console.warn("Could not load Payday Sale services:", err);
+    console.warn("Could not load Promotions services:", err);
     promoServices = [];
     promoServicesMessage = "Could not load services — please call us instead";
   }
@@ -107,31 +107,36 @@ function renderGuestRows() {
 
 /* ---------- calendar ---------- */
 
+/* Month calendar on the left, the chosen day's open start times on the
+   right (Calendly-style). The availability still comes from the
+   getPaydaySaleAvailability Cloud Function, one bed list per day; a start
+   time is "open" when every guest can be given their own bed, free for the
+   whole length of THEIR service, all starting at that time. */
 function initPromoCalendar() {
   const branchSelect = document.getElementById("promoBranch");
   const dateInput = document.getElementById("promoDate");
-  const prevBtn = document.getElementById("promoPrevDay");
-  const nextBtn = document.getElementById("promoNextDay");
   const statusEl = document.getElementById("promoCalendarStatus");
-  const listEl = document.getElementById("promoBedList");
+  const monthTitle = document.getElementById("promoMonthTitle");
+  const monthGrid = document.getElementById("promoMonthGrid");
+  const prevMonthBtn = document.getElementById("promoPrevMonth");
+  const nextMonthBtn = document.getElementById("promoNextMonth");
+  const slotsEl = document.getElementById("promoTimeSlots");
 
-  if (!branchSelect || !dateInput || !statusEl || !listEl) return;
+  if (!branchSelect || !dateInput || !statusEl || !monthGrid || !slotsEl) return;
 
-  const today = new Date().toISOString().split("T")[0];
+  const SLOT_STEP = 30;
+  const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+  const pad = (n) => String(n).padStart(2, "0");
+  const toDateValue = (year, month, day) => `${year}-${pad(month + 1)}-${pad(day)}`;
+
+  const nowLocal = new Date();
+  const today = toDateValue(nowLocal.getFullYear(), nowLocal.getMonth(), nowLocal.getDate());
   dateInput.value = today;
-  dateInput.setAttribute("min", today);
 
-  function addDays(dateValue, days) {
-    const [year, month, day] = dateValue.split("-").map(Number);
-    const date = new Date(year, month - 1, day);
-    date.setDate(date.getDate() + days);
-
-    return [
-      date.getFullYear(),
-      String(date.getMonth() + 1).padStart(2, "0"),
-      String(date.getDate()).padStart(2, "0")
-    ].join("-");
-  }
+  let viewYear = nowLocal.getFullYear();
+  let viewMonth = nowLocal.getMonth();
+  let lastData = null;
 
   function formatTime(hhmm) {
     const [hourStr, minute] = String(hhmm || "00:00").split(":");
@@ -143,7 +148,7 @@ function initPromoCalendar() {
   }
 
   function minutesToHHMM(total) {
-    return String(Math.floor(total / 60)).padStart(2, "0") + ":" + String(total % 60).padStart(2, "0");
+    return pad(Math.floor(total / 60)) + ":" + pad(total % 60);
   }
 
   function timeToMinutes(hhmm) {
@@ -151,121 +156,149 @@ function initPromoCalendar() {
     return hour * 60 + minute;
   }
 
-  function renderBeds(data) {
+  /* ----- month calendar ----- */
+
+  function renderMonth() {
+    monthTitle.textContent = `${MONTH_NAMES[viewMonth]} ${viewYear}`;
+
+    const firstWeekday = new Date(viewYear, viewMonth, 1).getDay();
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+    const cells = [];
+
+    /* Pad with the neighbouring months' dates (dimmed, not selectable),
+       so the grid is always full weeks like the reference layout. */
+    const totalCells = Math.ceil((firstWeekday + daysInMonth) / 7) * 7;
+
+    for (let i = 0; i < totalCells; i++) {
+      const date = new Date(viewYear, viewMonth, 1 - firstWeekday + i);
+      const value = toDateValue(date.getFullYear(), date.getMonth(), date.getDate());
+      const inMonth = date.getMonth() === viewMonth;
+      const past = value < today;
+      const classes = ["promo-cal-day"];
+
+      if (!inMonth || past) classes.push("promo-cal-day-off");
+      if (value === today) classes.push("promo-cal-day-today");
+      if (value === dateInput.value) classes.push("promo-cal-day-selected");
+
+      cells.push(
+        `<button type="button" class="${classes.join(" ")}" data-date="${value}"${!inMonth || past ? " disabled" : ""}${value === dateInput.value ? ' aria-pressed="true"' : ""}>${date.getDate()}</button>`
+      );
+    }
+
+    monthGrid.innerHTML = cells.join("");
+    prevMonthBtn.disabled = viewYear === nowLocal.getFullYear() && viewMonth === nowLocal.getMonth();
+  }
+
+  /* ----- time slots ----- */
+
+  /* Durations (minutes) of the guests' chosen services; before anything is
+     chosen a single 60-minute guest is assumed so open times still show. */
+  function currentDurations() {
+    const guestRows = document.getElementById("promoGuestRows");
+    const selects = guestRows ? Array.from(guestRows.querySelectorAll("select")) : [];
+    const chosen = selects.map((select) => (select.value && select.selectedOptions[0] ? Number(select.selectedOptions[0].dataset.duration) || 60 : 0));
+
+    return chosen.length > 0 && chosen.every(Boolean) ? chosen : [60];
+  }
+
+  function bedIsFree(bed, minute, duration) {
+    const end = minute + duration;
+    const taken = bed.taken.some(([start, stop]) => minute < stop && end > start);
+
+    return minute >= bed.from && end <= bed.to && !taken;
+  }
+
+  /* Finds a free bed for every guest at `minute` (small backtracking search,
+     as each guest has their own service length). Returns the beds in guest
+     order, or null. The server re-checks on submit. */
+  function assignBeds(beds, minute, durations) {
+    const picked = [];
+
+    const place = (index) => {
+      if (index === durations.length) return true;
+
+      for (const bed of beds) {
+        if (picked.includes(bed) || !bedIsFree(bed, minute, durations[index])) continue;
+        picked.push(bed);
+        if (place(index + 1)) return true;
+        picked.pop();
+      }
+
+      return false;
+    };
+
+    return place(0) ? picked.slice() : null;
+  }
+
+  function bedsFromData(data) {
+    return (data.beds || [])
+      .filter((bed) => bed.available)
+      .map((bed) => ({
+        number: bed.bed,
+        from: timeToMinutes(bed.from),
+        to: timeToMinutes(bed.to),
+        taken: (bed.occupied || [])
+          .concat(bed.held || [])
+          .map((range) => [timeToMinutes(range.startTime), timeToMinutes(range.endTime)])
+      }));
+  }
+
+  function renderSlots(data) {
+    lastData = data;
+
     if (!data.beds || data.beds.length === 0) {
       statusEl.textContent = data.blocked
-        ? "This date isn't available for the Payday Sale" +
+        ? "This date isn't available for Promotions" +
           (data.blockReason ? ` (${data.blockReason})` : "") +
           " — please choose another date."
         : "No beds are set up for this branch yet.";
-      listEl.innerHTML = "";
+      slotsEl.innerHTML = "";
       return;
     }
 
-    /* A blocked date still shows the bed calendar so guests can see the
-       day's schedule — just dimmed, with the reason above it. */
-    statusEl.textContent = data.blocked
-      ? "This date isn't available for the Payday Sale" +
-        (data.blockReason ? ` (${data.blockReason})` : "") +
-        " — please choose another date. Here's the schedule for reference."
-      : "";
+    if (data.blocked) {
+      statusEl.textContent =
+        "This date isn't available for Promotions" + (data.blockReason ? ` (${data.blockReason})` : "") + " — please choose another date.";
+      slotsEl.innerHTML = "";
+      return;
+    }
 
-    listEl.classList.toggle("promo-bed-list-blocked", !!data.blocked);
+    statusEl.textContent = "";
 
-    const PX_PER_MIN = 0.9;
+    const beds = bedsFromData(data);
+    const durations = currentDurations();
     const opening = timeToMinutes(data.openingTime);
     const closing = Math.max(opening + 60, timeToMinutes(data.closingTime));
-    const totalHeight = (closing - opening) * PX_PER_MIN;
-    const y = (minute) => (Math.min(Math.max(minute, opening), closing) - opening) * PX_PER_MIN;
 
-    const hourMarks = [opening];
-    for (let m = Math.ceil((opening + 1) / 60) * 60; m < closing; m += 60) hourMarks.push(m);
+    const now = new Date();
+    const nowMinutes = now.getHours() * 60 + now.getMinutes();
+    const isToday = dateInput.value === today;
+    const selectedTime = document.getElementById("promoFormTime");
+    const selectedMinute = selectedTime && selectedTime.value ? timeToMinutes(selectedTime.value) : null;
 
-    const header = data.beds
-      .map((bed) => `
-        <div class="promo-grid-head-cell${bed.available ? "" : " promo-grid-head-off"}" title="Bed ${bed.bed}: ${bed.available ? `${formatTime(bed.from)} – ${formatTime(bed.to)}` : "Not offered"}">
-          <strong>Bed ${bed.bed}</strong>
-          <small>${bed.available ? `${formatTime(bed.from)} – ${formatTime(bed.to)}` : "Not offered"}</small>
-        </div>`)
-      .join("");
+    const slots = [];
 
-    const timeCol = hourMarks
-      .map((m) => `<div class="promo-grid-hour" style="top:${y(m)}px;">${formatTime(minutesToHHMM(m))}</div>`)
-      .join("");
+    for (let minute = opening; minute < closing; minute += SLOT_STEP) {
+      const open = !(isToday && minute <= nowMinutes) && !!assignBeds(beds, minute, durations);
+      slots.push(
+        `<button type="button" class="promo-slot${minute === selectedMinute ? " promo-slot-selected" : ""}" data-minute="${minute}"${open ? "" : " disabled"}>${formatTime(minutesToHHMM(minute))}</button>`
+      );
+    }
 
-    const bedCols = data.beds
-      .map((bed) => {
-        const shade = (from, to) =>
-          to > from
-            ? `<div class="promo-grid-off" style="top:${y(from)}px;height:${y(to) - y(from)}px;"></div>`
-            : "";
+    slotsEl.innerHTML = slots.join("");
 
-        let off = "";
-        if (!bed.available) {
-          off = shade(opening, closing);
-        } else {
-          off = shade(opening, timeToMinutes(bed.from)) + shade(timeToMinutes(bed.to), closing);
-        }
-
-        const occupied = bed.available
-          ? (bed.occupied || [])
-              .map((range) => {
-                const start = Math.max(timeToMinutes(range.startTime), opening);
-                const end = Math.min(timeToMinutes(range.endTime), closing);
-                if (end <= start) return "";
-                return `<div class="promo-grid-occupied" title="Occupied" style="top:${y(start)}px;height:${y(end) - y(start)}px;"></div>`;
-              })
-              .join("")
-          : "";
-
-        const held = bed.available
-          ? (bed.held || [])
-              .map((range) => {
-                const start = Math.max(timeToMinutes(range.startTime), opening);
-                const end = Math.min(timeToMinutes(range.endTime), closing);
-                if (end <= start) return "";
-                return `<div class="promo-grid-held" title="On hold — expires when the timer ends" style="top:${y(start)}px;height:${y(end) - y(start)}px;"><span class="promo-hold-timer" data-expires="${range.expiresAt}">${formatCountdown(range.expiresAt - Date.now())}</span></div>`;
-              })
-              .join("")
-          : "";
-
-        const blockedRanges = (bed.occupied || []).concat(bed.held || []);
-
-        const openWindow = bed.available && !data.blocked
-          ? `data-bed="${bed.bed}" data-from="${timeToMinutes(bed.from)}" data-to="${timeToMinutes(bed.to)}" data-bed-number="${bed.bed}" data-occupied="${blockedRanges.map((r) => timeToMinutes(r.startTime) + "-" + timeToMinutes(r.endTime)).join(",")}"`
-          : "";
-
-        return `<div class="promo-grid-col${openWindow ? " promo-grid-col-pickable" : ""}" ${openWindow} style="height:${totalHeight}px;">${off}${occupied}${held}</div>`;
-      })
-      .join("");
-
-    listEl.innerHTML = `
-      <div class="promo-grid-scroll">
-        <div class="promo-grid" style="--bed-count:${data.beds.length};--hour-height:${PX_PER_MIN * 60}px;">
-          <div class="promo-grid-head">
-            <div class="promo-grid-head-cell promo-grid-corner">Time</div>
-            ${header}
-          </div>
-          <div class="promo-grid-body">
-            <div class="promo-grid-time" style="height:${totalHeight}px;">${timeCol}</div>
-            ${bedCols}
-          </div>
-        </div>
-      </div>`;
-
-    attachPicking(opening, PX_PER_MIN);
+    if (!slotsEl.querySelector(".promo-slot:not([disabled])")) {
+      statusEl.textContent = "No open times left on this date — please choose another date.";
+    }
   }
 
-  /* Clicking an open stretch of the calendar fills in the form's
-     Preferred Time on the hour (1-hour steps), previews every guest's card
-     on the grid, and scrolls to the form. Number of guests and every
-     guest's service must be chosen first. Each guest needs their own bed,
-     free for the whole length of THEIR service, all starting at the same
-     time — so the cards can have different heights. A small backtracking
-     search finds a bed for each guest (Guest 1 preferring the bed clicked,
-     the rest nearby); if the hour clicked doesn't work it tries the next
-     one. The server still re-checks on submit. */
-  function attachPicking(opening, pxPerMin) {
+  /* Tapping an open time fills in the form's Preferred Time and the beds
+     found for every guest, then scrolls to the details form. Number of
+     guests and every guest's service must be chosen first. */
+  slotsEl.addEventListener("click", (event) => {
+    const button = event.target.closest(".promo-slot");
+    if (!button || button.disabled || !lastData) return;
+
     const timeInput = document.getElementById("promoFormTime");
     const formEl = document.getElementById("promoDetailsCard");
     const guestsSelect = document.getElementById("promoFormGuests");
@@ -273,132 +306,47 @@ function initPromoCalendar() {
     const bedsField = document.getElementById("promoFormBeds");
     if (!timeInput || !guestsSelect || !guestRows) return;
 
-    const cols = Array.from(listEl.querySelectorAll(".promo-grid-col-pickable"));
-
-    const now = new Date();
-    const nowMinutes = now.getHours() * 60 + now.getMinutes();
-
-    const bedIsFree = (col, minute, duration) => {
-      const from = Number(col.dataset.from);
-      const to = Number(col.dataset.to);
-      const end = minute + duration;
-      const taken = (col.dataset.occupied || "")
-        .split(",")
-        .filter(Boolean)
-        .some((pair) => {
-          const [start, stop] = pair.split("-").map(Number);
-          return minute < stop && end > start;
-        });
-
-      return minute >= from && end <= to && !taken && !(dateInput.value === today && minute <= nowMinutes);
-    };
-
     const prompt = (field, text) => {
       field.closest(".field").classList.add("invalid");
       statusEl.textContent = text;
       field.scrollIntoView({ behavior: "smooth", block: "center" });
     };
 
-    cols.forEach((col) => {
-      col.addEventListener("click", (event) => {
-        if (guestsSelect.value === "") {
-          prompt(guestsSelect, "Please choose your number of guests first, then tap a time.");
-          return;
-        }
+    if (guestsSelect.value === "") {
+      prompt(guestsSelect, "Please choose your number of guests first, then tap a time.");
+      return;
+    }
 
-        const serviceSelects = Array.from(guestRows.querySelectorAll("select"));
-        const missing = serviceSelects.find((select) => select.value === "");
-        if (missing) {
-          prompt(missing, "Please choose a service for every guest first, then tap a time.");
-          return;
-        }
+    const missing = Array.from(guestRows.querySelectorAll("select")).find((select) => select.value === "");
+    if (missing) {
+      prompt(missing, "Please choose a service for every guest first, then tap a time.");
+      return;
+    }
 
-        const durations = serviceSelects.map((select) => Number(select.selectedOptions[0].dataset.duration) || 60);
-        const guests = durations.length;
+    const minute = Number(button.dataset.minute);
+    const durations = currentDurations();
+    const assigned = assignBeds(bedsFromData(lastData), minute, durations);
 
-        const rect = col.getBoundingClientRect();
-        const raw = opening + Math.floor((event.clientY - rect.top) / pxPerMin);
-        const clickIndex = cols.indexOf(col);
+    if (!assigned) {
+      statusEl.textContent = `There aren't enough open beds at that time for ${durations.length} guest${durations.length === 1 ? "" : "s"}. Please pick another time.`;
+      renderSlots(lastData);
+      return;
+    }
 
-        const bedOrder = cols
-          .slice()
-          .sort((a, b) => Math.abs(cols.indexOf(a) - clickIndex) - Math.abs(cols.indexOf(b) - clickIndex) || cols.indexOf(a) - cols.indexOf(b));
+    timeInput.value = minutesToHHMM(minute);
+    timeInput.closest(".field").classList.remove("invalid");
+    if (bedsField) bedsField.value = assigned.map((bed) => bed.number).join(",");
 
-        /* Tapping a spot that is already taken (occupied, or another
-           client's hold) must not select anything. */
-        const takenHere = (col.dataset.occupied || "")
-          .split(",")
-          .filter(Boolean)
-          .some((pair) => {
-            const [start, stop] = pair.split("-").map(Number);
-            return raw >= start && raw < stop;
-          });
+    slotsEl.querySelectorAll(".promo-slot-selected").forEach((el) => el.classList.remove("promo-slot-selected"));
+    button.classList.add("promo-slot-selected");
 
-        if (takenHere) {
-          statusEl.textContent = "That spot is already taken or on hold — please tap an open (white) spot.";
-          return;
-        }
+    statusEl.textContent =
+      `Selected ${formatTime(minutesToHHMM(minute))} for ${durations.length} guest${durations.length === 1 ? "" : "s"} — added to the form below.`;
 
-        /* Guest 1 always sits on the bed that was tapped; the other guests
-           go on nearby beds. */
-        const assign = (minute) => {
-          const picked = [];
+    if (formEl) formEl.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
 
-          const place = (index) => {
-            if (index === guests) return true;
-
-            for (const candidate of index === 0 ? [col] : bedOrder) {
-              if (picked.includes(candidate) || !bedIsFree(candidate, minute, durations[index])) continue;
-              picked.push(candidate);
-              if (place(index + 1)) return true;
-              picked.pop();
-            }
-
-            return false;
-          };
-
-          return place(0) ? picked.slice() : null;
-        };
-
-        let minute = Math.floor(raw / 60) * 60;
-        let assigned = assign(minute);
-
-        if (!assigned) {
-          minute += 60;
-          assigned = assign(minute);
-        }
-
-        if (!assigned) {
-          const guestOneFits = bedIsFree(col, Math.floor(raw / 60) * 60, durations[0]) || bedIsFree(col, Math.floor(raw / 60) * 60 + 60, durations[0]);
-
-          statusEl.textContent = guestOneFits
-            ? `There aren't enough open beds at that time for ${guests} guest${guests === 1 ? "" : "s"} — each guest needs a bed free for their whole service. Please pick another time.`
-            : `This bed isn't free for the full ${durations[0]} minutes from that time. Please tap another open spot.`;
-          return;
-        }
-
-        timeInput.value = minutesToHHMM(minute);
-        timeInput.closest(".field").classList.remove("invalid");
-        if (bedsField) bedsField.value = assigned.map((c) => c.dataset.bedNumber).join(",");
-
-        listEl.querySelectorAll(".promo-grid-pick").forEach((el) => el.remove());
-
-        assigned.forEach((target, index) => {
-          const pick = document.createElement("div");
-          pick.className = "promo-grid-pick" + (index > 0 ? " promo-grid-pick-companion" : "");
-          pick.style.top = (minute - opening) * pxPerMin + "px";
-          pick.style.height = durations[index] * pxPerMin + "px";
-          pick.innerHTML = `<span>G${index + 1}</span>`;
-          target.appendChild(pick);
-        });
-
-        statusEl.textContent =
-          `Selected ${formatTime(minutesToHHMM(minute))} for ${guests} guest${guests === 1 ? "" : "s"} — added to the form below.`;
-
-        if (formEl) formEl.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    });
-  }
+  /* ----- loading ----- */
 
   let requestToken = 0;
 
@@ -410,8 +358,8 @@ function initPromoCalendar() {
 
     if (silent !== true) {
       statusEl.textContent = "Loading availability…";
-      listEl.innerHTML = "";
-    }
+      slotsEl.innerHTML = "";
+      }
 
     const token = ++requestToken;
 
@@ -425,28 +373,64 @@ function initPromoCalendar() {
 
       if (token !== requestToken) return; // superseded by a newer request
 
-      renderBeds(result.data || {});
+      renderSlots(result.data || {});
     } catch (err) {
       if (token !== requestToken) return;
-      console.warn("Could not load Payday Sale availability:", err);
+      console.warn("Could not load Promotions availability:", err);
       statusEl.textContent = "Could not load availability right now — please try again in a moment.";
     }
   }
 
+  function selectDate(value) {
+    if (!value || value < today || value === dateInput.value) return;
+
+    dateInput.value = value;
+
+    /* A different day means a different time — clear the old pick. */
+    const timeInput = document.getElementById("promoFormTime");
+    const bedsField = document.getElementById("promoFormBeds");
+    if (timeInput) timeInput.value = "";
+    if (bedsField) bedsField.value = "";
+
+    renderMonth();
+    refresh();
+  }
+
+  monthGrid.addEventListener("click", (event) => {
+    const button = event.target.closest(".promo-cal-day");
+    if (button && !button.disabled) selectDate(button.dataset.date);
+  });
+
+  prevMonthBtn.addEventListener("click", () => {
+    if (prevMonthBtn.disabled) return;
+    viewMonth -= 1;
+    if (viewMonth < 0) { viewMonth = 11; viewYear -= 1; }
+    renderMonth();
+  });
+
+  nextMonthBtn.addEventListener("click", () => {
+    viewMonth += 1;
+    if (viewMonth > 11) { viewMonth = 0; viewYear += 1; }
+    renderMonth();
+  });
+
   /* A different group size or service may not fit the time already
-     picked, so clear it. */
+     picked, so clear it and re-work which times are open. */
   const guestsSelectEl = document.getElementById("promoFormGuests");
   const guestRowsEl = document.getElementById("promoGuestRows");
 
   const clearPicked = () => {
     const timeInput = document.getElementById("promoFormTime");
-    if (timeInput && timeInput.value) {
+    const hadPick = !!(timeInput && timeInput.value);
+
+    if (hadPick) {
       timeInput.value = "";
       const bedsField = document.getElementById("promoFormBeds");
       if (bedsField) bedsField.value = "";
-      listEl.querySelectorAll(".promo-grid-pick").forEach((node) => node.remove());
-      statusEl.textContent = "Your guests or services changed — please tap a time on the calendar again.";
     }
+
+    if (lastData) renderSlots(lastData);
+    if (hadPick) statusEl.textContent = "Your guests or services changed — please tap a time on the calendar again.";
   };
 
   if (guestsSelectEl) {
@@ -465,51 +449,15 @@ function initPromoCalendar() {
     });
   }
 
-  branchSelect.addEventListener("change", refresh);
-  dateInput.addEventListener("change", refresh);
+  branchSelect.addEventListener("change", () => refresh());
 
-  if (prevBtn) {
-    prevBtn.addEventListener("click", () => {
-      const next = addDays(dateInput.value || today, -1);
-      if (next < today) return; // never step before today
-      dateInput.value = next;
-      refresh();
-    });
-  }
-
-  if (nextBtn) {
-    nextBtn.addEventListener("click", () => {
-      dateInput.value = addDays(dateInput.value || today, 1);
-      refresh();
-    });
-  }
-
+  renderMonth();
   refresh();
 
-  /* Held slots (someone has ordered a voucher and it isn't plotted yet)
-     count down one hour. Tick the timers every second; when one runs out
-     the slot is free again, so reload the grid. Also re-poll now and then
-     so other people's new holds show up — but never while this visitor is
-     mid-pick, since a reload would wipe their preview. */
-  function formatCountdown(ms) {
-    const secs = Math.max(0, Math.min(3599, Math.floor(ms / 1000)));
-    return String(Math.floor(secs / 60)).padStart(2, "0") + ":" + String(secs % 60).padStart(2, "0");
-  }
-
+  /* Re-poll now and then so other people's new orders show up — but never
+     while this visitor has a time picked, since a reload would wipe it. */
   const timeField = document.getElementById("promoFormTime");
-  const isPicking = () => !!(timeField && timeField.value) || !!listEl.querySelector(".promo-grid-pick");
-
-  setInterval(() => {
-    let expired = false;
-
-    listEl.querySelectorAll(".promo-hold-timer").forEach((el) => {
-      const remaining = Number(el.dataset.expires) - Date.now();
-      if (remaining <= 0) expired = true;
-      el.textContent = formatCountdown(remaining);
-    });
-
-    if (expired && !isPicking()) refresh(true);
-  }, 1000);
+  const isPicking = () => !!(timeField && timeField.value);
 
   setInterval(() => {
     if (!isPicking() && !document.hidden) refresh(true);
@@ -620,7 +568,7 @@ function initPromoBookingForm() {
 }
 
 /* Same Cloud Function book.html's own form calls (see main.js's
-   submitBookingRequest) — a Payday Sale promo request is stored exactly
+   submitBookingRequest) — a Promotions request is stored exactly
    like any other public-website booking request, so it shows up in
    CrownOS's existing Booking Requests review flow with no extra wiring. */
 async function submitPaydayPromoRequest(data) {
@@ -649,7 +597,7 @@ async function submitPaydayPromoRequest(data) {
       return {
         ok: true,
         message:
-          "Thank you! Your voucher order was received and your slot is on hold for 1 hour (see the countdown on the calendar below). " +
+          "Thank you! Your voucher order was received and your slot is on hold for 1 hour (please keep your phone handy). " +
           "Our marketing team will confirm it and send your voucher to your email. If it isn't confirmed within the hour, the slot is released to other clients."
       };
     }
@@ -672,7 +620,7 @@ async function submitPaydayPromoRequest(data) {
 
     return { ok: false, message: fallbackMessage };
   } catch (err) {
-    console.warn("Payday Sale voucher order failed to reach the server:", err);
+    console.warn("voucher order failed to reach the server:", err);
     return { ok: false, message: fallbackMessage };
   }
 }

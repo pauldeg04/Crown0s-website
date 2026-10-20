@@ -4,6 +4,17 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-10-20 — Promotions page: month calendar + time slots, renamed from Payday Sale
+
+**Requested by:** User — copy the month-calendar + time-slot layout (colors stay on-brand) and rename Payday Sale to Promotions.
+
+- [promotions.html](promotions.html) (was `payday-promo.html`) / [js/promotions.js](js/promotions.js) (was `payday-promo.js`): the bed-by-time grid is replaced by a month calendar (left) and the chosen day's open start times in 2 columns (right, 30-minute steps, no header text so the list isn't cut off). A time is open only if every guest can get their own bed for their whole service; it re-evaluates when guests/services change. Picking a time fills Preferred Time + beds and scrolls to the form. Still uses `getPaydaySaleAvailability` / `submitPaydayVoucherOrder` unchanged. The hold-countdown on the grid is gone (held times just show as unavailable).
+- [css/style.css](css/style.css): new `.promo-cal-*` / `.promo-slot` styles; old grid styles removed.
+- [firebase.json](firebase.json): 301 redirect `/payday-promo` → `/promotions` so old links keep working. [robots.txt](robots.txt) disallows `/promotions` too.
+- Visible wording "Payday Sale" → "Promotions" / "promo"; the internal `[Payday Sale Promo]` notes tag is kept (CrownOS matches on it).
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/promotions.
+
 ## 2026-09-20 (3) — Payday promo: can no longer tap an occupied/held spot
 
 **Reported by:** User — tapping a time that was already occupied still selected it and covered the existing card.

@@ -1014,11 +1014,8 @@ input[type="time"]::-webkit-date-and-time-value { text-align: left; }
 .confirmation-box p { margin: 0; color: var(--sage-dark); }
 
 /* ==========================================================================
-   Payday Sale promo calendar (payday-promo.html, js/payday-promo.js)
-   View-only — no click handlers, just Branch/Date pickers and one
-   availability bar per bed. Mirrors the Open/Occupied/Not-offered
-   language CrownOS's own Payday Sale admin grid uses, in a much simpler
-   single-row-per-bed shape suited to a public page.
+   Promotions calendar (promotions.html, js/promotions.js)
+   Month calendar + open start times for the chosen day (Calendly-style).
    ========================================================================== */
 
 .promo-calendar-card {
@@ -1038,16 +1035,41 @@ input[type="time"]::-webkit-date-and-time-value { text-align: left; }
 }
 @media (max-width: 560px) { .promo-calendar-controls { grid-template-columns: 1fr; } }
 
-.promo-date-stepper {
-  display: flex;
-  align-items: stretch;
-  gap: 6px;
+.promo-calendar-status {
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  margin: 0 0 12px;
+  min-height: 1.2em;
 }
-.promo-date-stepper input[type="date"] { flex: 1; min-width: 0; }
 
-.promo-date-step-btn {
-  flex: 0 0 auto;
-  width: 42px;
+/* Month calendar (left) + open times for the chosen day (right). */
+.promo-cal-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+@media (max-width: 640px) { .promo-cal-layout { grid-template-columns: 1fr; } }
+
+.promo-cal-month,
+.promo-cal-times {
+  border: 1px solid rgba(20, 17, 10, 0.12);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  background: var(--white);
+}
+
+.promo-cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.promo-cal-nav h3 { margin: 0; font-size: 1rem; font-family: var(--font-body); font-weight: 700; color: var(--ink); }
+.promo-cal-nav-btn {
+  width: 36px;
+  height: 36px;
   border: 1px solid rgba(20, 17, 10, 0.16);
   border-radius: var(--radius-sm);
   background: var(--cream);
@@ -1057,136 +1079,67 @@ input[type="time"]::-webkit-date-and-time-value { text-align: left; }
   cursor: pointer;
   transition: background 0.2s ease;
 }
-.promo-date-step-btn:hover { background: var(--sage-light); }
+.promo-cal-nav-btn:hover:not(:disabled) { background: var(--sage-light); }
+.promo-cal-nav-btn:disabled { opacity: 0.35; cursor: default; }
 
-.promo-calendar-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  font-size: 0.8rem;
-  color: var(--ink-soft);
-  margin-bottom: 16px;
-}
-.promo-calendar-legend span { display: inline-flex; align-items: center; gap: 6px; }
-.promo-calendar-legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
-.promo-legend-open { background: #fff; border: 1px solid rgba(20, 17, 10, 0.25); }
-.promo-legend-occupied { background: #5a5a5a; }
-.promo-legend-held { background: #d9a520; }
-.promo-legend-unavailable { background: rgba(20, 17, 10, 0.12); }
-
-.promo-calendar-status {
-  font-size: 0.88rem;
-  color: var(--ink-soft);
-  margin: 0 0 12px;
-}
-
-.promo-bed-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.promo-bed-list-blocked { opacity: 0.55; filter: grayscale(0.6); }
-
-/* CrownOS-style timeline grid: bed columns, hours down the side. */
-.promo-grid-scroll { overflow-x: auto; border: 1px solid rgba(20, 17, 10, 0.12); border-radius: var(--radius-sm); }
-.promo-grid { width: 100%; }
-.promo-grid-head,
-.promo-grid-body {
+.promo-cal-weekdays,
+.promo-cal-grid {
   display: grid;
-  grid-template-columns: 54px repeat(var(--bed-count, 1), minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
 }
-.promo-grid-head-cell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding: 8px 2px;
-  background: #0B1849;
-  color: #fff;
-  border-right: 1px solid rgba(255, 255, 255, 0.18);
+.promo-cal-weekdays { margin-bottom: 6px; }
+.promo-cal-weekdays span {
   text-align: center;
-  font-size: 0.66rem;
-}
-.promo-grid-head-cell small { display: none; }
-.promo-grid-head-off { background: #7a2727; }
-.promo-grid-time {
-  position: relative;
-  background: var(--cream);
-  border-right: 1px solid rgba(20, 17, 10, 0.1);
-}
-.promo-grid-hour {
-  position: absolute;
-  left: 0;
-  right: 0;
-  transform: translateY(-1px);
-  padding: 2px 6px;
-  font-size: 0.7rem;
+  font-size: 0.62rem;
   font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--ink-soft);
-  text-align: right;
 }
-.promo-grid-col {
-  position: relative;
-  background-color: #fff;
-  background-image: repeating-linear-gradient(to bottom, rgba(20, 17, 10, 0.1) 0, rgba(20, 17, 10, 0.1) 1px, transparent 1px, transparent var(--hour-height));
-  border-right: 1px solid rgba(20, 17, 10, 0.08);
+
+.promo-cal-day {
+  aspect-ratio: 1 / 1;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: none;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease;
 }
-.promo-grid-off {
-  position: absolute;
-  left: 0;
-  right: 0;
-  background-image: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.07) 0, rgba(0, 0, 0, 0.07) 6px, transparent 6px, transparent 12px);
-  background-color: rgba(20, 17, 10, 0.04);
+.promo-cal-day:hover:not(:disabled) { background: var(--sage-light); }
+.promo-cal-day-off { color: rgba(20, 17, 10, 0.25); cursor: default; }
+.promo-cal-day-today { border-color: var(--sage); }
+.promo-cal-day-selected,
+.promo-cal-day-selected:hover:not(:disabled) { background: var(--sage); border-color: var(--sage); color: #fff; font-weight: 700; }
+
+.promo-cal-times { display: flex; flex-direction: column; min-height: 0; }
+.promo-time-slots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  align-content: start;
 }
-.promo-grid-col-pickable { cursor: pointer; }
-.promo-grid-col-pickable:hover { background-color: #fbf6e3; }
-@media (max-width: 560px) {
-  .promo-calendar-card { padding: 18px 10px; }
-  .promo-grid-head,
-  .promo-grid-body { grid-template-columns: 44px repeat(var(--bed-count, 1), minmax(0, 1fr)); }
-  .promo-grid-hour { font-size: 0.6rem; padding: 2px 3px; }
-  .promo-grid-head-cell { font-size: 0.6rem; }
+
+.promo-slot {
+  padding: 10px 4px;
+  border: 1px solid rgba(20, 17, 10, 0.16);
+  border-radius: var(--radius-sm);
+  background: var(--cream);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
-.promo-grid-pick-companion { background: var(--wood-light) !important; }
-.promo-grid-pick {
-  align-items: flex-start !important;
-  padding-top: 3px !important;
-  font-size: 0.56rem !important;
-  line-height: 1.05;
-  text-align: center;
-  padding: 0 1px;
-  position: absolute;
-  left: 3px;
-  right: 3px;
-  opacity: 0.92;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 7px;
-  background: var(--sage);
-  color: #fff;
-  font-size: 0.72rem;
-  font-weight: 700;
-  pointer-events: none;
-  box-shadow: 0 2px 8px rgba(20, 17, 10, 0.25);
-}
-.promo-grid-occupied {
-  position: absolute;
-  left: 2px;
-  right: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  background-color: #5a5a5a;
-  background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.08) 0, rgba(255, 255, 255, 0.08) 6px, transparent 6px, transparent 12px);
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 0.72rem;
-  font-weight: 700;
-  overflow: hidden;
-}
+.promo-slot:hover:not(:disabled) { background: var(--sage-light); border-color: var(--sage); }
+.promo-slot:disabled { opacity: 0.35; cursor: default; text-decoration: line-through; }
+.promo-slot-selected,
+.promo-slot-selected:hover:not(:disabled) { background: var(--sage); border-color: var(--sage); color: #fff; font-weight: 700; }
 
 /* ==========================================================================
    FAQ / accordion
@@ -1769,30 +1722,6 @@ input[type="time"]::-webkit-date-and-time-value { text-align: left; }
 
 #promoBookingForm,
 #promoDetailsCard { scroll-margin-top: 90px; }
-
-.promo-grid-held {
-  position: absolute;
-  left: 2px;
-  right: 2px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: 3px;
-  border-radius: 4px;
-  background-color: #d9a520;
-  background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.22) 0, rgba(255, 255, 255, 0.22) 6px, transparent 6px, transparent 12px);
-  color: #fff;
-  overflow: hidden;
-  pointer-events: none;
-}
-.promo-hold-timer {
-  font-size: 0.56rem;
-  font-weight: 800;
-  line-height: 1.05;
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-}
 
 /* Number of Guests -> one "Guest N" + service dropdown row per guest. */
 .promo-guest-rows { display: flex; flex-direction: column; gap: 14px; }

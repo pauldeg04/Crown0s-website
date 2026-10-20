@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Payday Sale | Crown Head Spa</title>
-<meta name="description" content="Crown Head Spa Payday Sale — check bed availability and send us your preferred schedule.">
+<title>Promotions | Crown Head Spa</title>
+<meta name="description" content="Crown Head Spa Promotions — check bed availability and send us your preferred schedule.">
 <!-- Unlisted: no nav link points here, and this keeps it out of search
      results too. Reachable only by whoever has this exact link — see
      robots.txt's matching Disallow entry. -->
@@ -64,9 +64,9 @@
 
   <section class="page-hero">
     <div class="container">
-      <p class="eyebrow">Payday Sale</p>
+      <p class="eyebrow">Promotions</p>
       <h1>Check availability &amp; send your schedule</h1>
-      <p>Browse open beds for your preferred branch and date below, then send us your preferred schedule. This is a request — we'll call or text you to confirm.</p>
+      <p>Pick your preferred branch, date and time below, then send us your preferred schedule. This is a request — we'll call or text you to confirm.</p>
     </div>
   </section>
 
@@ -117,27 +117,26 @@
               <option value="Calamba">Crown Head Spa — Calamba</option>
             </select>
           </div>
-
-          <div class="field">
-            <label for="promoDate">Date</label>
-            <div class="promo-date-stepper">
-              <button type="button" class="promo-date-step-btn" id="promoPrevDay" aria-label="Previous day">‹</button>
-              <input type="date" id="promoDate">
-              <button type="button" class="promo-date-step-btn" id="promoNextDay" aria-label="Next day">›</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="promo-calendar-legend">
-          <span><i class="promo-legend-open"></i> Open</span>
-          <span><i class="promo-legend-occupied"></i> Occupied</span>
-          <span><i class="promo-legend-held"></i> On hold</span>
-          <span><i class="promo-legend-unavailable"></i> Not offered</span>
+          <input type="hidden" id="promoDate">
         </div>
 
         <p class="promo-calendar-status" id="promoCalendarStatus">Loading availability…</p>
 
-        <div class="promo-bed-list" id="promoBedList"></div>
+        <div class="promo-cal-layout">
+          <div class="promo-cal-month">
+            <div class="promo-cal-nav">
+              <button type="button" class="promo-cal-nav-btn" id="promoPrevMonth" aria-label="Previous month">‹</button>
+              <h3 id="promoMonthTitle"></h3>
+              <button type="button" class="promo-cal-nav-btn" id="promoNextMonth" aria-label="Next month">›</button>
+            </div>
+            <div class="promo-cal-weekdays"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div>
+            <div class="promo-cal-grid" id="promoMonthGrid"></div>
+          </div>
+
+          <div class="promo-cal-times">
+            <div class="promo-time-slots" id="promoTimeSlots"></div>
+          </div>
+        </div>
 
       </div>
 
@@ -162,7 +161,7 @@
             <label for="promoFormEmail">Email Address <span style="font-weight:400;color:var(--ink-soft);">(Required)</span></label>
             <input type="email" id="promoFormEmail" name="email" placeholder="you@email.com" required>
             <span class="error-msg">Please enter a valid email address.</span>
-            <span class="field-hint">Your Payday Sale voucher will be sent to this email.</span>
+            <span class="field-hint">Your voucher will be sent to this email.</span>
           </div>
 
           <div class="field full">
@@ -180,7 +179,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
           <div>
             <h4>Thank you! Your request has been received.</h4>
-            <p>Please keep your phone handy — our staff will call or text the mobile number you provided to confirm your Payday Sale schedule.</p>
+            <p>Please keep your phone handy — our staff will call or text the mobile number you provided to confirm your schedule.</p>
           </div>
         </div>
         </div>
@@ -271,6 +270,6 @@
   </button>
 </div>
 <script src="js/main.js"></script>
-<script src="js/payday-promo.js"></script>
+<script src="js/promotions.js"></script>
 </body>
 </html>
