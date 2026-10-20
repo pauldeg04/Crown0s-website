@@ -4,6 +4,15 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-10-20 (2) — Promotions page: "Please confirm your order" pop-up
+
+**Requested by:** User — a final confirmation pop-up when the client clicks Order Voucher.
+
+- [js/promotions.js](js/promotions.js): after the form validates, `confirmPromoOrder()` shows a pop-up summarising branch, date, time, name, contact, email, notes, each guest's service + promo price and the total, with a 1-hour-hold reminder. **Confirm Order** sends the order as before; **Go Back**, Esc or clicking outside cancels — nothing is sent and no slot is held until confirmed.
+- [css/style.css](css/style.css): `.promo-confirm-*` styles.
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/promotions.
+
 ## 2026-10-20 — Promotions page: month calendar + time slots, renamed from Payday Sale
 
 **Requested by:** User — copy the month-calendar + time-slot layout (colors stay on-brand) and rename Payday Sale to Promotions.

@@ -500,6 +500,21 @@ function initPromoBookingForm() {
       return;
     }
 
+    /* Final confirmation — nothing is sent (and no slot is held) until the
+       client reviews the order and confirms it. */
+    const confirmed = await confirmPromoOrder({
+      branch: branchSelect.value,
+      date: dateInput.value,
+      startTime: document.getElementById("promoFormTime").value,
+      guests: Array.from(document.querySelectorAll("#promoGuestRows select")).map((select) => select.value),
+      clientName: document.getElementById("promoFormName").value.trim(),
+      mobile: document.getElementById("promoFormMobile").value.trim(),
+      email: document.getElementById("promoFormEmail").value.trim(),
+      notes: document.getElementById("promoFormNotes").value.trim()
+    });
+
+    if (!confirmed) return;
+
     if (submitBtn) {
       submitBtn.disabled = true;
       submitBtn.dataset.originalText = submitBtn.textContent;
@@ -564,6 +579,86 @@ function initPromoBookingForm() {
   form.querySelectorAll("[required]").forEach((field) => {
     field.addEventListener("input", () => field.closest(".field").classList.remove("invalid"));
     field.addEventListener("change", () => field.closest(".field").classList.remove("invalid"));
+  });
+}
+
+/* Pop-up "Please confirm your order" window. Resolves true when the client
+   presses Confirm Order, false on Go Back / Esc / clicking outside. */
+function confirmPromoOrder(order) {
+  const esc = (text) =>
+    String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  const peso = (amount) => "₱" + Number(amount).toLocaleString("en-PH");
+
+  const [year, month, day] = order.date.split("-").map(Number);
+  const dateText = new Date(year, month - 1, day).toLocaleDateString("en-PH", {
+    weekday: "long", year: "numeric", month: "long", day: "numeric"
+  });
+
+  const [hourStr, minute] = order.startTime.split(":");
+  const timeText = `${Number(hourStr) % 12 || 12}:${minute} ${Number(hourStr) >= 12 ? "PM" : "AM"}`;
+
+  let total = 0;
+  const guestRows = order.guests
+    .map((name, index) => {
+      const service = promoServices.find((item) => item.name === name);
+      const price = service ? Number(service.price) : 0;
+      total += price;
+
+      return `<li><span>Guest ${index + 1} — ${esc(name)}${service ? ` (${service.duration} mins)` : ""}</span><strong>${service ? peso(price) : ""}</strong></li>`;
+    })
+    .join("");
+
+  const overlay = document.createElement("div");
+  overlay.className = "promo-confirm-overlay";
+  overlay.innerHTML = `
+    <div class="promo-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="promoConfirmTitle">
+      <h3 id="promoConfirmTitle">Please confirm your order</h3>
+      <p class="promo-confirm-intro">Review your details below. Your chosen time will be held for 1 hour once you confirm.</p>
+
+      <dl class="promo-confirm-details">
+        <div><dt>Branch</dt><dd>Crown Head Spa — ${esc(order.branch)}</dd></div>
+        <div><dt>Date</dt><dd>${esc(dateText)}</dd></div>
+        <div><dt>Time</dt><dd>${esc(timeText)}</dd></div>
+        <div><dt>Name</dt><dd>${esc(order.clientName)}</dd></div>
+        <div><dt>Contact</dt><dd>${esc(order.mobile)}</dd></div>
+        <div><dt>Email</dt><dd>${esc(order.email)}</dd></div>
+        ${order.notes ? `<div><dt>Notes</dt><dd>${esc(order.notes)}</dd></div>` : ""}
+      </dl>
+
+      <ul class="promo-confirm-guests">${guestRows}</ul>
+      ${total > 0 ? `<p class="promo-confirm-total"><span>Total</span><strong>${peso(total)}</strong></p>` : ""}
+
+      <div class="promo-confirm-actions">
+        <button type="button" class="btn btn-outline" data-confirm="no">Go Back</button>
+        <button type="button" class="btn btn-primary" data-confirm="yes">Confirm Order</button>
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+  document.body.classList.add("promo-confirm-open");
+
+  const confirmBtn = overlay.querySelector('[data-confirm="yes"]');
+  confirmBtn.focus();
+
+  return new Promise((resolve) => {
+    const close = (result) => {
+      document.removeEventListener("keydown", onKey);
+      overlay.remove();
+      document.body.classList.remove("promo-confirm-open");
+      resolve(result);
+    };
+
+    const onKey = (event) => {
+      if (event.key === "Escape") close(false);
+    };
+
+    document.addEventListener("keydown", onKey);
+
+    overlay.addEventListener("click", (event) => {
+      if (event.target === overlay) close(false);
+      const choice = event.target.closest("[data-confirm]");
+      if (choice) close(choice.dataset.confirm === "yes");
+    });
   });
 }
 
