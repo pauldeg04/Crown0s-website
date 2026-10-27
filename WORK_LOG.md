@@ -4,6 +4,17 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-10-27 (2) — SEO: canonical tags on all indexable pages
+
+**Requested by:** User — second fix from the SEO/UX audit.
+
+- Added `<link rel="canonical">` (absolute `https://crownheadspa.com/...`, no `.html`, no trailing slash except the homepage, matching `cleanUrls` and the sitemap) right after the meta description in [index.html](index.html), [about.html](about.html), [services.html](services.html), [branches.html](branches.html), [gallery.html](gallery.html), [promos.html](promos.html), [testimonials.html](testimonials.html), [contact.html](contact.html), [book.html](book.html), [careers.html](careers.html) and [privacy.html](privacy.html).
+- [head-spa-binan.html](head-spa-binan.html) and [head-spa-calamba.html](head-spa-calamba.html) already had correct canonicals. [promotions.html](promotions.html) intentionally left without one (disallowed in robots.txt).
+
+**Deployed:** `npx firebase-tools deploy --only hosting` → https://crownheadspa.com.
+
+---
+
 ## 2026-10-27 — SEO: robots.txt was never reaching production
 
 **Requested by:** User — SEO/UX audit of crownheadspa.com for expansion toward southern Metro Manila; first fix from the audit.
