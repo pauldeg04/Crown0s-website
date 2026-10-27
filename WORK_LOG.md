@@ -4,6 +4,18 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-10-27 (6) — SEO: titles, meta descriptions and structured data
+
+**Requested by:** User — items 2 and 4 of the SEO audit (schema for prices/services, new titles and meta descriptions), plus FAQ schema and branch coordinates.
+
+- Titles and meta descriptions rewritten (title 44–54 chars, description 112–149) with service, location and real prices/hours/phones, and the matching `og:*` / `twitter:*` tags, for [index.html](index.html), [services.html](services.html), [branches.html](branches.html), [promos.html](promos.html), [gallery.html](gallery.html), [testimonials.html](testimonials.html), [contact.html](contact.html), [about.html](about.html) and [book.html](book.html). Not touched: the two branch pages, careers, privacy.
+- JSON-LD: [index.html](index.html) now has a `HealthAndBeautyBusiness` (`@id` `https://crownheadspa.com/#business`, logo, Facebook, priceRange ₱350–₱5,500, areaServed Laguna, links to both branches). [services.html](services.html) has 13 `Service` entries with a Regular `Offer` and a VIP `Offer` where a VIP price exists (massages: Regular only). [head-spa-binan.html](head-spa-binan.html) and [head-spa-calamba.html](head-spa-calamba.html) gained `@id`, `parentOrganization`, `priceRange`, `areaServed`, `sameAs`, `hasMap` and `geo` (coordinates supplied by the user from Google Maps: Biñan 14.331444746580159, 121.08880201224095; Calamba 14.200096051249973, 121.16512887553337).
+- [contact.html](contact.html): `FAQPage` JSON-LD built from the five visible FAQ items. Schema text must keep matching the visible FAQ — update both together.
+
+**Deployed:** `npx firebase-tools deploy --only hosting` → https://crownheadspa.com.
+
+---
+
 ## 2026-10-27 (5) — SEO: keyword headings and consistent "Pure Head Spa" naming
 
 **Requested by:** User — fix the "Pure Head Spa" vs "Signature Head Spa" inconsistency and put keywords in the H1/H2s (items 1 and 2 of the SEO audit).
