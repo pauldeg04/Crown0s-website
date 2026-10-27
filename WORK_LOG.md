@@ -4,6 +4,18 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-10-27 (3) — Services page: massage and combo durations synced to CrownOS
+
+**Requested by:** User — noticed the Pure Body Massage durations on the Services page didn't match the CrownOS Service Master; confirmed CrownOS is correct.
+
+- [services.html](services.html): Crown Relax `60 / 90` → `60 mins`, Crown Relief `60 / 90` → `90 mins`, Crown Recovery `90 / 120` → `120 mins`, The Serenity Set `105` → `135 mins` (Serenity 45 + Relief 90). Removed the "Plus option (…mins) includes…" wording; Relief now states "Includes Hot Stones & Biscuits" and Recovery "Includes the Triple Treat…, Biscuits & Nuts, and a Special Treat Dessert". Relax no longer mentions the Herbal Pack (no Plus version in CrownOS).
+- [book.html](book.html): fallback template option "The Serenity Set (105 mins)" → 135. The live dropdown is built from `crownServiceMasterList` and was already correct.
+- Not changed: the fallback `<template>` in book.html still lists archived services (Signature, Detox Flow, Thermal Calm, Warm Glow) and lacks Relax/Relief/Recovery.
+
+**Deployed:** `npx firebase-tools deploy --only hosting` → https://crownheadspa.com/services.
+
+---
+
 ## 2026-10-27 (2) — SEO: canonical tags on all indexable pages
 
 **Requested by:** User — second fix from the SEO/UX audit.
