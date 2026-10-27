@@ -4,6 +4,18 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-10-27 (9) — Book page popup is controlled from CrownOS
+
+**Requested by:** User — the Book page popup poster should be managed from CrownOS (Promotions > Pop up Poster).
+
+- [js/main.js](js/main.js): `initPromoModal` now asks `getPopupPoster()` which reads Firestore `popupPoster/bookPage`. Active + not past `showUntil` → that image pops up; off/expired/removed → no popup. Doc never created, Firestore error, or no answer within 2.5s → the poster built into [book.html](book.html) (Comfort Treat) as before.
+- The session "seen" flag now stores the poster URL, so a newly uploaded poster shows again to people who closed the old one.
+- Tested locally with a stubbed Firestore (missing / off / on).
+
+**Deployed:** `npx firebase-tools deploy --only hosting`.
+
+---
+
 ## 2026-10-27 (8) — Promos page: poster carousel
 
 **Requested by:** User — automatic gallery of promo posters on the Promos page, managed from CrownOS.

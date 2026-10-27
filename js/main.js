@@ -28,16 +28,63 @@ document.addEventListener("DOMContentLoaded", () => {
 
 const PROMO_MODAL_KEY = "crownPromoSeen";
 
+/* Which poster to pop up is controlled in CrownOS (Marketing > Promotions >
+   Pop up Poster), stored in Firestore popupPoster/bookPage. Resolves to
+   { url } to show a poster, or null for no popup. If the doc was never
+   created, or Firestore can't be reached within 2.5s, the poster built into
+   book.html is used. */
+function getPopupPoster() {
+  const builtIn = { url: null };
+  if (!window.firebase || !firebase.apps || firebase.apps.length === 0) {
+    return Promise.resolve(builtIn);
+  }
+
+  const lookup = firebase.firestore().collection("popupPoster").doc("bookPage").get()
+    .then((doc) => {
+      if (!doc.exists) return builtIn;
+      const data = doc.data();
+      const d = new Date();
+      const today = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+      if (!data.imageUrl || data.active === false) return null;
+      if (data.showUntil && data.showUntil < today) return null;
+      return { url: data.imageUrl };
+    })
+    .catch(() => builtIn);
+
+  const timeout = new Promise((resolve) => setTimeout(() => resolve(builtIn), 2500));
+  return Promise.race([lookup, timeout]);
+}
+
 function initPromoModal() {
   const modal = document.getElementById("promoModal");
   if (!modal) return;
 
+  getPopupPoster().then((poster) => {
+    if (poster) setupPromoModal(modal, poster);
+  });
+}
+
+function setupPromoModal(modal, poster) {
+  // The seen-flag stores which poster was shown, so a newly uploaded poster
+  // pops up again for people who already dismissed the old one.
+  const seenValue = poster.url || "builtin";
+
   // sessionStorage throws in private-mode Safari, so a failed read just means
   // the popup shows — better than the page erroring out.
   try {
-    if (sessionStorage.getItem(PROMO_MODAL_KEY) === "1") return;
+    if (sessionStorage.getItem(PROMO_MODAL_KEY) === seenValue) return;
   } catch (err) {
     /* storage unavailable — fall through and show it */
+  }
+
+  if (poster.url) {
+    const img = modal.querySelector(".promo-modal-poster");
+    img.src = poster.url;
+    img.alt = "Crown Head Spa promo";
+    img.removeAttribute("width");
+    img.removeAttribute("height");
+    const title = modal.querySelector("#promoModalTitle");
+    if (title) title.textContent = "Crown Head Spa promo";
   }
 
   const card = modal.querySelector(".promo-modal-card");
@@ -58,7 +105,7 @@ function initPromoModal() {
     modal.hidden = true;
     document.body.style.overflow = "";
     try {
-      sessionStorage.setItem(PROMO_MODAL_KEY, "1");
+      sessionStorage.setItem(PROMO_MODAL_KEY, seenValue);
     } catch (err) {
       /* storage unavailable — the popup will simply show again next load */
     }
