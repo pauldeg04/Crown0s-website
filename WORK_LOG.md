@@ -4,6 +4,17 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-10-27 — SEO: robots.txt was never reaching production
+
+**Requested by:** User — SEO/UX audit of crownheadspa.com for expansion toward southern Metro Manila; first fix from the audit.
+
+- [firebase.json](firebase.json): removed `"*.txt"` and `"!robots.txt"` from `hosting.ignore`. Firebase's ignore list doesn't support the `!` negation, so `*.txt` excluded [robots.txt](robots.txt) from every deploy and `/robots.txt` returned Firebase's 404 page. robots.txt is the only `.txt` file in the site, so nothing else is newly published.
+- robots.txt content unchanged: allows all, disallows `/promotions` and `/payday-promo`, and points to `https://crownheadspa.com/sitemap.xml`.
+
+**Deployed:** `firebase deploy --only hosting` → https://crownheadspa.com/robots.txt.
+
+---
+
 ## 2026-10-20 (2) — Promotions page: "Please confirm your order" pop-up
 
 **Requested by:** User — a final confirmation pop-up when the client clicks Order Voucher.
