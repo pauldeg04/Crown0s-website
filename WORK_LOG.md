@@ -4,6 +4,19 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-10-27 (5) — SEO: keyword headings and consistent "Pure Head Spa" naming
+
+**Requested by:** User — fix the "Pure Head Spa" vs "Signature Head Spa" inconsistency and put keywords in the H1/H2s (items 1 and 2 of the SEO audit).
+
+- Naming: [index.html](index.html) card "Signature Head Spa" → "Pure Head Spa" (matches the price list and services page); eyebrow "Signature Services" → "Our Services"; [promos.html](promos.html) "Crown Relief Plus" → "Crown Relief" (no "Plus" in CrownOS). "Pure Head Spa" was chosen because the latest price list uses it — the user did not pick explicitly.
+- H1s now carry the service and location: homepage "Head Spa & Massage in Biñan and Calamba, Laguna" (the old "Your Royal Relaxation Awaits" became the eyebrow above it), services, branches, promos, gallery, testimonials, contact, about and book. The two branch pages already had good H1s and were not touched.
+- Homepage H2s reworded to include "head spa" / the branch names, e.g. "This month's head spa promos", "A peek inside our Biñan and Calamba head spa", CTA "Stress Ends Here — Book Your Head Spa".
+- Not changed: page `<title>` tags and meta descriptions.
+
+**Deployed:** `npx firebase-tools deploy --only hosting` → https://crownheadspa.com.
+
+---
+
 ## 2026-10-27 (4) — Services page: latest price list, Kiddie Calm Deals
 
 **Requested by:** User — put the latest price list on the website: Regular and VIP prices only (no First Timer rate), no "other services", ignore the flyer layout, and add Kiddie Calm Deals.
