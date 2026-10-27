@@ -4,6 +4,20 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-10-27 (7) — SEO: service-area landing pages for the south
+
+**Requested by:** User — expand the target market toward southern Metro Manila without opening a new branch, so Biñan and Calamba stay the only branches.
+
+- New pages, each pointing at a real branch and honest that there is no branch in the named area: [head-spa-alabang-muntinlupa.html](head-spa-alabang-muntinlupa.html), [head-spa-las-pinas-paranaque.html](head-spa-las-pinas-paranaque.html), [head-spa-santa-rosa.html](head-spa-santa-rosa.html) (Biñan) and [head-spa-cabuyao.html](head-spa-cabuyao.html) (Calamba). Each has a keyword H1, directions, parking, five popular treatments with Regular/VIP prices, hours, four FAQs with matching `FAQPage` JSON-LD, canonical, title and meta.
+- Facts supplied by the user — Biñan: about 10 mins from SLEX Mamplasan Exit; up to 4 shared parking slots with co-tenants plus a nearby mall. Calamba: about 15 mins from SLEX Turbina Exit, along the highway going to Pansol and Los Baños; up to 8 shared slots plus the supermarket across the road. No travel times from Alabang/Las Piñas/Cabuyao were invented.
+- [head-spa-binan.html](head-spa-binan.html) and [head-spa-calamba.html](head-spa-calamba.html): new "Visiting from nearby?" section linking to the area pages.
+- [sitemap.xml](sitemap.xml): four new URLs at priority 0.8 (16 total).
+- The prices on these pages are copied from the services page — update both if prices change.
+
+**Deployed:** `npx firebase-tools deploy --only hosting` → https://crownheadspa.com.
+
+---
+
 ## 2026-10-27 (6) — SEO: titles, meta descriptions and structured data
 
 **Requested by:** User — items 2 and 4 of the SEO audit (schema for prices/services, new titles and meta descriptions), plus FAQ schema and branch coordinates.
