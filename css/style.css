@@ -1805,3 +1805,79 @@ input[type="time"]::-webkit-date-and-time-value { text-align: left; }
   row-gap: 6px;
 }
 .promo-guest-row .error-msg { grid-column: 2; }
+
+/* ==========================================================================
+   Promo poster carousel (promos.html, js/promo-carousel.js)
+   ========================================================================== */
+
+.promo-carousel-section { padding-bottom: 0; }
+.promo-carousel-section[hidden] { display: none; }
+
+.promo-carousel {
+  position: relative;
+  width: min(100%, 560px);
+  max-height: 80vh;
+  margin: 0 auto;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--charcoal);
+  box-shadow: var(--shadow);
+}
+
+.promo-carousel-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.6s ease;
+}
+
+.promo-carousel-slide { flex: 0 0 100%; height: 100%; }
+
+.promo-carousel-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.promo-carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(12, 10, 7, 0.55);
+  color: var(--white);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.promo-carousel-arrow:hover { background: rgba(12, 10, 7, 0.8); }
+.promo-carousel-arrow[hidden] { display: none; }
+.promo-carousel-prev { left: 10px; }
+.promo-carousel-next { right: 10px; }
+
+.promo-carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+.promo-carousel-dots[hidden] { display: none; }
+
+.promo-carousel-dots button {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--beige);
+  cursor: pointer;
+}
+.promo-carousel-dots button.active { background: var(--sage); transform: scale(1.25); }
+
+@media (prefers-reduced-motion: reduce) {
+  .promo-carousel-track { transition: none; }
+}

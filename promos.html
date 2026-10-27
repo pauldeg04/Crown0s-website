@@ -75,6 +75,17 @@
     </div>
   </section>
 
+  <section class="section promo-carousel-section" id="promoCarouselSection" hidden>
+    <div class="container">
+      <div class="promo-carousel" aria-roledescription="carousel" aria-label="Current promos">
+        <div class="promo-carousel-track"></div>
+        <button type="button" class="promo-carousel-arrow promo-carousel-prev" aria-label="Previous promo">&#8249;</button>
+        <button type="button" class="promo-carousel-arrow promo-carousel-next" aria-label="Next promo">&#8250;</button>
+      </div>
+      <div class="promo-carousel-dots"></div>
+    </div>
+  </section>
+
   <section class="section">
     <div class="container">
       <div class="grid grid-3">
@@ -205,6 +216,10 @@
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.15 2 11.26c0 2.91 1.45 5.51 3.73 7.21V22l3.41-1.87c.91.25 1.87.39 2.86.39 5.52 0 10-4.15 10-9.26S17.52 2 12 2Zm1.02 12.47-2.55-2.72-4.98 2.72 5.48-5.82 2.61 2.72 4.92-2.72-5.48 5.82Z"/></svg>
   </button>
 </div>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/promo-carousel.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

@@ -4,6 +4,19 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-10-27 (8) — Promos page: poster carousel
+
+**Requested by:** User — automatic gallery of promo posters on the Promos page, managed from CrownOS.
+
+- [promos.html](promos.html): new carousel section under the hero (hidden until posters load; stays hidden if there are none). Loads the Firebase app + Firestore SDKs and [js/firebase-init.js](js/firebase-init.js).
+- [js/promo-carousel.js](js/promo-carousel.js) (new): reads the `promoPosters` collection, keeps posters that are active and not past `showUntil`, sorts by `order`, auto-advances every 5s; arrows, dots, swipe, pauses on hover/focus/hidden tab; respects reduced-motion.
+- [css/style.css](css/style.css): `.promo-carousel*` styles; the stage takes the aspect ratio of the first poster.
+- Posters are uploaded in CrownOS (Marketing > Promotions > Promo Posters tab). The Firestore rule making `promoPosters` publicly readable lives in CrownOS's `firestore.rules`.
+
+**Deployed:** `npx firebase-tools deploy --only hosting` → https://crownheadspa.com/promos.
+
+---
+
 ## 2026-10-27 (7) — SEO: service-area landing pages for the south
 
 **Requested by:** User — expand the target market toward southern Metro Manila without opening a new branch, so Biñan and Calamba stay the only branches.
