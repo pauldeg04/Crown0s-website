@@ -4,6 +4,21 @@ Running log of changes made to the public website, newest entry on top.
 
 ---
 
+## 2026-10-27 (4) — Services page: latest price list, Kiddie Calm Deals
+
+**Requested by:** User — put the latest price list on the website: Regular and VIP prices only (no First Timer rate), no "other services", ignore the flyer layout, and add Kiddie Calm Deals.
+
+- [services.html](services.html): every service now shows its duration pill beside the category tag and its price at the right. Head Spa and Combos show Regular + VIP (Reset ₱1,200/₱600, Serenity ₱2,000/₱1,000, Detox & Glow ₱4,000/₱2,000, Reset Duo ₱2,100/₱1,500, Serenity Set ₱3,400/₱2,300, Recovery Ritual ₱5,500/₱3,400). Massages show Regular only because the price list gives no VIP rate (Relax ₱900, Relief ₱1,400, Recovery ₱2,000).
+- New **Kiddie Calm Deals** section (30 mins, ages 5–12 with guardian): Little Crown Head Spa ₱700/₱350, Family Duo ₱1,800/₱899, Family Trio ₱3,100/₱1,550, Family Royal Four ₱4,300/₱2,400, plus a note under the list.
+- Inclusions updated to the price list: Relief = Double Treat (Herbal Pack, Hot Stones), Recovery and Recovery Ritual = Triple Treat (Herbal Pack, Hot Stones, Flameless Ventosa), Serenity Set = Double Treat; "Includes scalp analysis" on Serenity and Detox & Glow; old "Plus" wording dropped. Serenity Set duration shown as 2 hrs 15 mins.
+- Removed the old "Available Add-Ons" line (other services are intentionally not listed).
+- [css/style.css](css/style.css): `.service-item-price`, `.price-regular`, `.price-vip` (gold), `.price-solo`, `.price-note`; duration pill restyled when inside the heading.
+- Left as is: "30% OFF your first visit" copy in the services hero and homepage.
+
+**Deployed:** `npx firebase-tools deploy --only hosting` → https://crownheadspa.com/services.
+
+---
+
 ## 2026-10-27 (3) — Services page: massage and combo durations synced to CrownOS
 
 **Requested by:** User — noticed the Pure Body Massage durations on the Services page didn't match the CrownOS Service Master; confirmed CrownOS is correct.

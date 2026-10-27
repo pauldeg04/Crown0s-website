@@ -656,8 +656,27 @@ p { margin: 0 0 1em; color: var(--ink-soft); }
   padding: 6px 14px;
   border-radius: 999px;
 }
+.service-item-info h3 .service-item-duration {
+  margin-left: 6px;
+  padding: 3px 10px;
+  font-size: 0.68rem;
+  vertical-align: middle;
+}
+.service-item-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.25;
+  min-width: 92px;
+}
+.price-regular { font-weight: 600; font-size: 0.92rem; color: var(--ink-soft); }
+.price-vip { font-weight: 700; font-size: 1.1rem; color: var(--gold); }
+.price-vip small { font-size: 0.65rem; letter-spacing: 0.06em; text-transform: uppercase; margin-right: 2px; }
+.price-solo { font-weight: 700; font-size: 1.1rem; color: var(--ink); }
+.price-note { margin: 0; font-size: 0.88rem; color: var(--ink-soft); }
 @media (max-width: 620px) {
   .service-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .service-item-price { align-items: flex-start; }
 }
 
 /* ==========================================================================
